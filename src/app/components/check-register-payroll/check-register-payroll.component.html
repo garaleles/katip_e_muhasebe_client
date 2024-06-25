@@ -1,0 +1,471 @@
+<app-blank pageName="Çek Bordroları" [routes]="['Hareketler','Çek Bordroları']">
+  <app-section sectionTitle="Çek Bordro Listesi">
+    <div class="form-group row">
+      <div class="col-9">
+        <button (click)="openPayroll()" class="btn btn-dark" data-toggle="modal" data-target="#createModal">
+          <i class="fa-solid fa-plus me-1"></i>
+          Bordro Ekle
+        </button>
+      </div>
+
+      <div class="col-3">
+        <input [(ngModel)]="search" type="search" class="form-control" placeholder="Aranacak değer girin...">
+      </div>
+    </div>
+
+    <div class="form-group mt-2">
+      <table class="table table-hover">
+        <thead>
+        <tr>
+          <th>#</th>
+          <th>Tarih</th>
+          <th>Cari Hesap</th>
+          <th>Bordro Numarası</th>
+          <th>Bordro Tutarı</th>
+          <th>İşlemler</th>
+        </tr>
+        </thead>
+        <tbody>
+          @for (data of checkRegisterPayrolls | checkRegisterPayroll: search; track data) {
+            <tr>
+              <td>{{ $index + 1 }}</td>
+              <td>{{ data.date }}</td>
+              <td>{{ data.customer?.name || 'Kayıt Boş' }}</td>
+              <td>{{ data.payrollNumber }}</td>
+              <td>{{ data.payrollAmount | trCurrency: '₺': true }}</td>
+              <td>
+                <button data-toggle="modal" data-target="#updateModal" (click)="get(data)"
+                        class="btn btn-outline-primary btn-sm me-1">
+                  <i class="fa-solid fa-edit"></i>
+                </button>
+                <button (click)="deleteById(data)" class="btn btn-outline-danger btn-sm">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </app-section>
+</app-blank>
+
+<!-- Create Modal -->
+<div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title fs-5">Çek Giriş Bordrosu Ekle</h3>
+
+        <button type="button" #createModalCloseBtn class="btn btn-outline-danger" data-dismiss="modal">
+          <i class="fa-solid fa-x"></i>
+        </button>
+      </div>
+
+      <form formValidate #createForm="ngForm" autocomplete="off" (ngSubmit)="create(createForm)">
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-6">
+              <div class="form-group">
+                <label>Bordro Numarası</label>
+                <input type="text" [(ngModel)]="createModel.payrollNumber" class="form-control" name="payrollNumber">
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="form-group">
+                <label>Tarih</label>
+                <input type="date" required [(ngModel)]="createModel.date" class="form-control" name="date">
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-6">
+              <label>Cari</label>
+              <select class="form-control" [(ngModel)]="createModel.customerId" required name="customerId">
+                <option *ngFor="let customer of customers" [value]="customer.id">{{ customer.name }}</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <div class="form-group">
+                <label>Açıklama</label>
+                <input type="text" [(ngModel)]="createModel.description" class="form-control" name="description">
+              </div>
+            </div>
+          </div>
+          <hr>
+          <div class="row">
+            <div class="col-3">
+              <div class="form-group">
+                <label>Banka</label>
+                <input type="text" [(ngModel)]="createModel.bankName" class="form-control" [ngModelOptions]="{standalone:true}">
+                <div class="invalid-feedback"></div>
+              </div>
+            </div>
+            <div class="col-3">
+              <div class="form-group">
+                <label>Şube</label>
+                <input type="text" [(ngModel)]="createModel.branchName" class="form-control" [ngModelOptions]="{standalone:true}">
+                <div class="invalid-feedback"></div>
+              </div>
+            </div>
+            <div class="col-2">
+              <div class="form-group">
+                <label>Hesap No</label>
+                <input type="text" [(ngModel)]="createModel.accountNumber" class="form-control" [ngModelOptions]="{standalone:true}">
+                <div class="invalid-feedback"></div>
+              </div>
+            </div>
+            <div class="col-2">
+              <div class="form-group">
+                <label>Çek No</label>
+                <input type="text" [(ngModel)]="createModel.checkNumber" class="form-control" [ngModelOptions]="{standalone:true}">
+                <div class="invalid-feedback"></div>
+              </div>
+            </div>
+            <div class="col-2">
+              <div class="form-group">
+                <label>Tutar</label>
+                <input type="number" [(ngModel)]="createModel.amount" class="form-control" [ngModelOptions]="{standalone:true}">
+                <div class="invalid-feedback"></div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-3">
+              <div class="form-group">
+                <label>Borçlusu</label>
+                <input type="text" [(ngModel)]="createModel.debtor" class="form-control" [ngModelOptions]="{standalone:true}">
+                <div class="invalid-feedback"></div>
+              </div>
+            </div>
+            <div class="col-3">
+              <div class="form-group">
+                <label>Alacaklısı</label>
+                <input type="text" [(ngModel)]="createModel.creditor" class="form-control" [ngModelOptions]="{standalone:true}">
+                <div class="invalid-feedback"></div>
+              </div>
+            </div>
+            <div class="col-3">
+              <div class="form-group">
+                <label>Ciranta</label>
+                <input type="text" [(ngModel)]="createModel.endorser" class="form-control" [ngModelOptions]="{standalone:true}">
+                <div class="invalid-feedback"></div>
+              </div>
+            </div>
+            <div class="col-2">
+              <div class="form-group">
+                <label>Vade</label>
+                <input type="date" [(ngModel)]="createModel.dueDate" class="form-control" [ngModelOptions]="{standalone:true}">
+                <div class="invalid-feedback"></div>
+              </div>
+            </div>
+            <div class="col-1">
+              <label>İşlemler</label>
+              <button type="button" class="btn btn-danger w-100" (click)="addDetail()" [disabled]="isFormIncomplete()">
+                <i class="fa-solid fa-plus me-1"></i>
+                Ekle
+              </button>
+            </div>
+          </div>
+          <hr>
+          <div class="form-group mt-2">
+            <table id="payrollDetails" class="table table-hover">
+              <thead>
+              <tr>
+                <th>#</th>
+                <th>Banka</th>
+                <th>Şube</th>
+                <th>Hesap No</th>
+                <th>Çek No</th>
+                <th>Borçlu</th>
+                <th>Alacaklı</th>
+                <th>Ciranta</th>
+                <th>Vade</th>
+                <th>Tutar</th>
+                <th>İşlemler</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let detail of createModel.details; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td>{{ detail.bankName }}</td>
+                <td>{{ detail.branchName }}</td>
+                <td>{{ detail.accountNumber }}</td>
+                <td>{{ detail.checkNumber }}</td>
+                <td>{{ detail.debtor }}</td>
+                <td>{{ detail.creditor }}</td>
+                <td>{{ detail.endorser }}</td>
+                <td>{{ detail.dueDate | date: 'dd.MM.yyyy' }}</td>
+                <td>{{ detail.amount | currency: '₺' }}</td>
+                <td>
+                  <button (click)="removeDetailItem(i)" class="btn btn-outline-danger btn-sm">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+          <hr>
+          <div id="payrollTotals" class="row mt-2">
+
+            <div class="col-4">
+              <div class="form-group mt-2" style="text-align: center">
+                <label style="color: red;">Çek Sayısı</label>
+                <input style="text-align: center; background-color:#8FBCBB"
+                       type="text"
+                       class="form-control text-end"
+                       disabled
+                       [value]="calculateCheckCount()"
+                >
+              </div>
+            </div>
+
+            <div class="col-4">
+              <div class="form-group mt-2" style="text-align: center">
+                <label style="color: red">Bordro Tutarı</label>
+                <input style="text-align: center; background-color:#8FBCBB" type="text"
+                       class="form-control" disabled
+                       [value]="calculateTotalAmount() | trCurrency: '₺': true"
+                >
+              </div>
+            </div>
+
+            <div class="col-4">
+              <div class="form-group mt-2" style="text-align: center">
+                <label style="color: red">Ortalama Vade</label>
+                <input style="text-align: center; background-color:#8FBCBB" type="text"
+                       class="form-control"
+                       disabled
+                       [value]="calculateAverageMaturity()| date: 'dd.MM.yyyy' "
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-dark w-100" [disabled]="!createModel.details.length">Kaydet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Update Modal -->
+<div class="modal fade" id="updateModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title fs-5">Bordro Güncelleme Formu</h3>
+        <button type="button" #updateModalCloseBtn class="btn btn-outline-danger" data-dismiss="modal">
+          <i class="fa-solid fa-x"></i>
+        </button>
+
+      </div>
+      <form formValidate #updateForm="ngForm" autocomplete="off" (ngSubmit)="update(updateForm)">
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-6">
+              <div class="form-group">
+                <label>Tarih</label>
+                <input type="date" required [(ngModel)]="updateModel.date" class="form-control" name="updateDate">
+              </div>
+              <div class="form-group">
+                <label>Cari</label>
+                <select class="form-control" [(ngModel)]="updateModel.customerId" required name="updateCustomerId">
+                  <option *ngFor="let customer of customers" [value]="customer.id">{{ customer.name }}</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="col-6">
+              <div class="form-group">
+                <label>Bordro Numarası</label>
+                <input type="text" class="form-control" readonly name="updatePayrollNumber"
+                       [value]="updateModel.payrollNumber">
+              </div>
+
+
+              <div class="form-group">
+                <label>Açıklama</label>
+                <input type="text" [(ngModel)]="updateModel.description" class="form-control" name="updateDescription">
+              </div>
+            </div>
+          </div>
+
+          <hr>
+          <div class="row">
+            <div class="col-3">
+              <div class="form-group">
+                <label>Banka</label>
+                <input type="text" [(ngModel)]="updateModel.bankName" class="form-control"
+                       [ngModelOptions]="{standalone:true}">
+                <div class="invalid-feedback"></div>
+              </div>
+            </div>
+            <div class="col-3">
+              <div class="form-group">
+                <label>Şube</label>
+                <input type="text" [(ngModel)]="updateModel.branchName" class="form-control"
+                       [ngModelOptions]="{standalone:true}">
+                <div class="invalid-feedback"></div>
+              </div>
+            </div>
+            <div class="col-2">
+              <div class="form-group">
+                <label>Hesap No</label>
+                <input type="text" [(ngModel)]="updateModel.accountNumber" class="form-control"
+                       [ngModelOptions]="{standalone:true}">
+                <div class="invalid-feedback"></div>
+              </div>
+            </div>
+            <div class="col-2">
+              <div class="form-group">
+                <label>Çek No</label>
+                <input type="text" [(ngModel)]="updateModel.checkNumber" class="form-control"
+                       [ngModelOptions]="{standalone:true}">
+                <div class="invalid-feedback"></div>
+              </div>
+            </div>
+            <div class="col-2">
+              <div class="form-group">
+                <label>Tutar</label>
+                <input type="number" [(ngModel)]="updateModel.amount" class="form-control"
+                       [ngModelOptions]="{standalone:true}">
+                <div class="invalid-feedback"></div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-3">
+              <div class="form-group">
+                <label>Borçlusu</label>
+                <input type="text" [(ngModel)]="updateModel.debtor" class="form-control"
+                       [ngModelOptions]="{standalone:true}">
+                <div class="invalid-feedback"></div>
+              </div>
+            </div>
+            <div class="col-3">
+              <div class="form-group">
+                <label>Alacaklısı</label>
+                <input type="text" [(ngModel)]="updateModel.creditor" class="form-control"
+                       [ngModelOptions]="{standalone:true}">
+                <div class="invalid-feedback"></div>
+              </div>
+            </div>
+            <div class="col-3">
+              <div class="form-group">
+                <label>Ciranta</label>
+                <input type="text" [(ngModel)]="updateModel.endorser" class="form-control"
+                       [ngModelOptions]="{standalone:true}">
+                <div class="invalid-feedback"></div>
+              </div>
+            </div>
+            <div class="col-2">
+              <div class="form-group">
+                <label>Vade</label>
+                <input type="date" [(ngModel)]="updateModel.dueDate" class="form-control"
+                       [ngModelOptions]="{standalone:true}">
+                <div class="invalid-feedback"></div>
+              </div>
+            </div>
+            <div class="col-1">
+              <label>İşlemler</label>
+              <button type="button" class="btn btn-danger w-100" (click)="addDetailUp()">
+                <i class="fa-solid fa-plus me-1"></i>
+                Ekle
+              </button>
+            </div>
+          </div>
+          <hr>
+          <div class="form-group mt-2">
+            <table id="updatePayrollDetails" class="table table-hover">
+              <thead>
+              <tr>
+                <th>#</th>
+                <th>Banka</th>
+                <th>Şube</th>
+                <th>Hesap No</th>
+                <th>Çek No</th>
+                <th>Borçlu</th>
+                <th>Alacaklı</th>
+                <th>Ciranta</th>
+                <th>Vade</th>
+                <th>Tutar</th>
+                <th>İşlemler</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let detail of updateModel.details; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td>{{ detail.bankName }}</td>
+                <td>{{ detail.branchName }}</td>
+                <td>{{ detail.accountNumber }}</td>
+                <td>{{ detail.checkNumber }}</td>
+                <td>{{ detail.debtor }}</td>
+                <td>{{ detail.creditor }}</td>
+                <td>{{ detail.endorser }}</td>
+                <td>{{ detail.dueDate | date: 'dd.MM.yyyy' }}</td>
+                <td>{{ detail.amount | currency: '₺' }}</td>
+                <td>
+                  <button (click)="removeDetailItemUp(i)" class="btn btn-outline-danger btn-sm">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+          <hr>
+          <div id="updatePayrollTotals" class="row mt-2">
+
+            <div class="col-4">
+              <div class="form-group mt-2" style="text-align: center">
+                <label style="color: red;">Çek Sayısı</label>
+                <input style="text-align: center; background-color:#8FBCBB"
+                       type="text"
+                       class="form-control text-end"
+                       disabled
+                       [value]="updateCalculateCheckCount()"
+                       name="updateCheckCount"
+                >
+              </div>
+            </div>
+
+            <div class="col-4">
+              <div class="form-group mt-2" style="text-align: center">
+                <label style="color: red">Bordro Tutarı</label>
+                <input style="text-align: center; background-color:#8FBCBB" type="text"
+                       class="form-control" disabled
+                       [value]="updateCalculateTotalAmount() | trCurrency: '₺': true"
+                       name="updatePayrollAmount"
+                >
+              </div>
+            </div>
+
+            <div class="col-4">
+              <div class="form-group mt-2" style="text-align: center">
+                <label style="color: red">Ortalama Vade</label>
+                <input style="text-align: center; background-color:#8FBCBB" type="text"
+                       class="form-control"
+                       disabled
+                       [value]="updateModel.averageMaturityDate | date: 'dd.MM.yyyy'"
+                       name="updateAverageMaturityDate"
+                >
+              </div>
+            </div>
+
+
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary w-100">Güncelle</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+

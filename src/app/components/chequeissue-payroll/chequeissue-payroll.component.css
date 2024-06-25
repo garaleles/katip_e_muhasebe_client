@@ -1,0 +1,19 @@
+/* CSS dosyanızda bu sınıfı tanımlayın */
+.custom-modal-width {
+  max-width: 50%; /* İstediğiniz genişliği belirleyin */
+}
+#completePayroll { /* Style the whole invoice container */
+  font-family: sans-serif; /* Choose a font suitable for printing */
+}
+
+#payrollDetails th, #payrollDetails td {
+  border: 1px solid #ddd; /* Add borders to the table */
+  padding: 8px; /* Add some padding for readability */
+}
+
+#payrollTotals {
+  display: flex; /* Use flexbox to align the totals */
+  justify-content: space-between; /* Space the totals evenly */
+
+}
+/* ... your existing styles ... */

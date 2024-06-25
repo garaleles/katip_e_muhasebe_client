@@ -1,0 +1,72 @@
+<app-blank pageName="Ana Sayfa">
+  <app-section sectionTitle="BALA | Ön Muhasebe" class="text-center">
+    <section style="width: 80%; height: auto">
+      <h1 style="color: #0c84ff; font-size: 52px; font-family: 'Algerian'">Ana Sayfa</h1>
+      <hr>
+      <div class="row">
+        <div class="col-4" style="background-color: #00a379; border: 1.5px solid black">
+          <div class="d-flex justify-content-center">
+            <app-card [title]="'Toplam Satışlar'" [value]="totalSales"></app-card>
+          </div>
+        </div>
+        <div class="col-4" style="background-color: #BD362F; border: 1.5px solid black">
+          <div class="d-flex justify-content-center">
+            <app-card [title]="'Toplam Alışlar'" [value]="totalPurchases"></app-card>
+          </div>
+        </div>
+        <div class="col-4" style="background-color: #00a379; border: 1.5px solid black">
+          <div class="d-flex justify-content-center">
+            <app-card [title]="'Toplam Giderler'" [value]="totalExpenses"></app-card>
+          </div>
+        </div>
+      </div>
+
+    </section>
+    <section style="width: 80%; height: auto">
+
+      <hr>
+      <div class="row">
+        <div class="col-4" style="background-color: #00a379; border: 1.5px solid black">
+          <div class="d-flex justify-content-center">
+            <app-card [title]="'Carilerden Alacaklar'" [value]="totalDebts"></app-card>
+          </div>
+        </div>
+        <div class="col-4" style="background-color: #BD362F; border: 1.5px solid black">
+          <div class="d-flex justify-content-center">
+            <app-card [title]="'Carilere Borçlar'" [value]="totalWhits"></app-card>
+          </div>
+        </div>
+        <div class="col-4" style="background-color: #00a379; border: 1.5px solid black">
+          <div class="d-flex justify-content-center">
+            <app-card [title]="'Stok Değeri'" [value]="totalStockValue"></app-card>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <section style="width: 80%; height: auto">
+
+      <hr>
+      <div class="row">
+        <div class="col-4" style="background-color: #00a379; border: 1.5px solid black">
+          <div class="d-flex justify-content-center">
+            <app-card [title]="'Kasalar Toplam Bakiye'" [value]="totalCash"></app-card>
+          </div>
+        </div>
+        <div class="col-4" style="background-color: #BD362F; border: 1.5px solid black">
+          <div class="d-flex justify-content-center">
+            <app-card [title]="'Bankalar Toplam Bakiye'" [value]="totalBanks"></app-card>
+          </div>
+        </div>
+        <div class="col-4" style="background-color: #00a379; border: 1.5px solid black">
+          <div class="d-flex justify-content-center">
+            <app-card [title]="'Menkul Değerler(Kasa+Banka)'" [value]="totalCash + totalBanks"></app-card>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+  </app-section>
+</app-blank>

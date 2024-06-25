@@ -1,0 +1,13 @@
+.card {
+  /* burada kartın stilini ayarlayabilirsiniz */
+}
+.card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.value {
+  font-size: 2em;
+  font-weight: bold;
+}

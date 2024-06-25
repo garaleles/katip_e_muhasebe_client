@@ -1,0 +1,65 @@
+<app-blank pageName="{{product.name}} Stok Hareketleri"
+           [routes]="['Kayıtlar','Stoklar',product.name + ' Stok Hareketleri']">
+  <app-section sectionTitle="{{product.name}} Stok Hareketleri">
+    <div class="form-group row">
+      <div class="col-9">
+        <button class="btn btn-success" (click)="exportToExcel()">
+          <i class="fa-solid fa-file-excel me-1"></i>
+          Excel'e Aktar
+        </button>
+      </div>
+
+      <div class="col-3">
+        <input [(ngModel)]="search" type="search" class="form-control" placeholder="Aranacak değer girin...">
+      </div>
+    </div>
+
+    <div class="form-group mt-2">
+      <table class="table table-hover">
+        <thead>
+        <tr>
+          <th>#</th>
+          <th>Tarih</th>
+          <th>Fatura Numarası</th>
+          <th>Açıklama</th>
+          <th>G.Miktar</th>
+          <th>Ç.Miktar</th>
+          <th>Stok Durumu</th>
+          <th>Fiyatı(Kdv Dahil)</th>
+          <th>Toplam Tutar(Kdv Dahil)</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        <tr *ngFor="let data of calculateRunningBalance(product.details)|productDetail: search|paginate: { itemsPerPage: 10, currentPage: p }; let i = index">
+          <td>{{ i + 1 }}</td>
+          <td>{{ data.date | date: 'dd.MM.yyyy' }}</td>
+          <td>{{ data.invoiceNumber }}</td>
+          <td>{{ data.description }}</td>
+          <td>{{ data.deposit }}</td>
+          <td>{{ data.withdrawal }}</td>
+          <td [ngStyle]="{'color': data.balance < 0 ? 'red' : 'green'}">
+            {{ data.balance }}
+<!--            ({{data.balance < 0 ? 'Eksi Bakiye' : 'Stokta Var'}})-->
+          </td>
+          <td>{{ (data.grandTotal / (data.deposit + data.withdrawal)) | trCurrency: '₺':true }}</td>
+          <td>{{ data.grandTotal | trCurrency: '₺':true }}</td>
+        </tr>
+
+        </tbody>
+      </table>
+
+      <div class="text-center">
+        <pagination-controls
+          (pageChange)="p = $event"
+          previousLabel="Önceki"
+          nextLabel="Sonraki"
+        >
+        </pagination-controls>
+      </div>
+
+    </div>
+  </app-section>
+</app-blank>
+
+

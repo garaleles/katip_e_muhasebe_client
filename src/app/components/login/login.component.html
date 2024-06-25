@@ -1,0 +1,60 @@
+<body class="hold-transition login-page">
+  <div class="login-box">
+    <div class="card card-outline card-dark">
+      <div class="card-header text-center">
+        <a class="h1"><b>BALA </b>e-Muhasebe</a>
+        <p class="login-box-msg">Giriş yapmak için bilgilerinizi doldurun</p>
+      </div>
+      <div class="card-body">
+
+
+        <div class="input-group mb-3">
+          <input [(ngModel)]="model.emailOrUserName" type="email" class="form-control" placeholder="Email">
+          <div class="input-group-append">
+            <div class="input-group-text">
+              <span class="fas fa-envelope"></span>
+            </div>
+          </div>
+        </div>
+        <div class="input-group mb-3">
+          <input [(ngModel)]="model.password" type="password" class="form-control" placeholder="Password">
+          <div class="input-group-append">
+            <div class="input-group-text">
+              <span class="fas fa-lock"></span>
+            </div>
+          </div>
+        </div>
+
+        <button (click)="signIn()" class="btn btn-dark btn-block">
+          <i class="fa-solid fa-lock me-1"></i>
+          Giriş Yap
+        </button>
+        <div style="float: right; margin-top: 5px;">
+          <a data-toggle="modal" data-target="#sendConfirmEmailModal" href="#">Onay Mailini Tekrar Gonder</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</body>
+
+<div class="modal fade" id="sendConfirmEmailModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5">Onay E-Postası</h1>
+        <button type="button" #sendConfirmEmailModalCloseBtn class="btn btn-outline-danger" data-dismiss="modal" aria-label="Close">X</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="email">E-Posta</label>
+          <input type="email" class="form-control" id="email" [(ngModel)]="email"
+            placeholder="E-Posta adresinizi giriniz">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button (click)="sendConfirmEmail()" type="button" class="btn btn-primary">E-Posta Doğrula</button>
+      </div>
+    </div>
+  </div>
+</div>
