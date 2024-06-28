@@ -3,13 +3,13 @@ import {Check} from "./check.model";
 import {BankModel} from "./bank.model";
 import {CashRegisterModel} from "./cash-register.model";
 import {ChequeissuePayrollDetailModel} from "./chequeissue-payroll-detail.model";
+import {BankDetailModel} from "./bank-detail.model";
 
 export class ChequeissuePayrollModel{
   id: string='';
-  status: CheckStatusEnum= new CheckStatusEnum();
-  statusValue: number=0;
+  status: CheckStatusEnum = CheckStatusEnum.InPortfolio;
   payrollNumber: string='';
-  customerId: string = "";
+  customerId: string | null = null;
   customer: CustomerModel = new CustomerModel();
   checkId: string='';
   check: Check = new Check();
@@ -18,11 +18,16 @@ export class ChequeissuePayrollModel{
   checkCount: number=0;
   date: string='';
   averageMaturityDate: string='';
-  bankId: string='';
+  bankId?: string | null;
   bank: BankModel = new BankModel();
-  cashRegisterId: string='';
+  cashRegisterId?: string | null;
   cashRegister: CashRegisterModel = new CashRegisterModel();
+  bankDetailId: string = '';
+  bankDetail: BankDetailModel = new BankDetailModel();
+  cashRegisterDetailId: string = '';
+  cashRegisterDetail: CashRegisterModel = new CashRegisterModel();
   details: ChequeissuePayrollDetailModel[]=[];
+
 
   // The properties below should be part of CheckRegisterPayrollDetail, not CheckRegisterPayroll
   // Removing these as they are not relevant to CheckRegisterPayroll
@@ -35,18 +40,22 @@ export class ChequeissuePayrollModel{
   debtor: string = '';
   creditor: string = '';
   endorser: string = '';
-  bankDetailId: string = '';
-  cashRegisterDetailId: string = '';
+
+
+
 
 }
 
 
-export class CheckStatusEnum {
-  Paid = 1;
-  Unpaid = 2;
-  Endorsed = 3;
-  Returned = 4;
-  Banked = 5;
-  SendToBankForCollateral = 6;
-  InPortfolio = 7;
+export enum CheckStatusEnum {
+  Paid = 1,
+  Unpaid = 2,
+  Endorsed = 3,
+  Returned = 4,
+  Banked = 5,
+  SendToBankForCollateral = 6,
+  InPortfolio = 7
 }
+
+
+

@@ -3,8 +3,7 @@ import {CheckStatusEnum} from "./chequeissue-payroll.model";
 
 export class CheckDetail {
   id:string = '';
-  status: CheckStatusEnum = new CheckStatusEnum();
-  statusValue: number = 0;
+  status: CheckStatusEnum = CheckStatusEnum.InPortfolio;
   dueDate: string = '';
   issuedDate?: string;
   collectedDate?: string;

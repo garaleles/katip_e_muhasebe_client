@@ -1,4 +1,4 @@
-import {Component, ElementRef, ViewChild} from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {Check} from "../../models/check.model";
 import {BankModel} from "../../models/bank.model";
 import {CashRegisterModel} from "../../models/cash-register.model";
@@ -8,9 +8,10 @@ import {SwalService} from "../../services/swal.service";
 import {SharedModule} from "../../modules/shared.module";
 import {ChequeissuePayrollPipe} from "../../pipes/chequeissue-payroll.pipe";
 import {DatePipe} from "@angular/common";
-import {ChequeissuePayrollModel} from "../../models/chequeissue-payroll.model";
+import { ChequeissuePayrollModel} from "../../models/chequeissue-payroll.model";
 import {NgForm} from "@angular/forms";
 import {ChequeissuePayrollDetailModel} from "../../models/chequeissue-payroll-detail.model";
+import { CheckStatusEnum } from '../../models/chequeissue-payroll.model';
 
 @Component({
   selector: 'app-chequeissue-payroll',
@@ -23,7 +24,9 @@ import {ChequeissuePayrollDetailModel} from "../../models/chequeissue-payroll-de
   templateUrl: './chequeissue-payroll.component.html',
   styleUrl: './chequeissue-payroll.component.css'
 })
-export class ChequeissuePayrollComponent {
+export class ChequeissuePayrollComponent implements OnInit{
+  CheckStatusEnum = CheckStatusEnum;
+
   chequeissuePayrolls: ChequeissuePayrollModel[] = [];
   checks: Check[] = [];
   banks: BankModel[] = [];
@@ -33,10 +36,10 @@ export class ChequeissuePayrollComponent {
   search: string = "";
   payrollNumberGenerated = false;
   p: number = 1;
-  isCreating: boolean = true; // Durum değişkeni
+  isCreating: boolean = true;
   isBankReadonly: boolean = true;
   isCashRegisterReadonly: boolean = true;
-
+  isCustomerReadonly: boolean = true;
 
 
 
@@ -96,9 +99,14 @@ export class ChequeissuePayrollComponent {
 
   create(form: NgForm) {
     if (form.valid) {
-      console.log("Gönderilen Model:", JSON.stringify(this.createModel, null, 2)); // Gönderilen verileri kontrol edin
+      //console.log("Gönderilen Model:", JSON.stringify(this.createModel, null, 2)); // Gönderilen verileri kontrol edin
       this.createModel.checkCount = this.calculateCheckCount();
       this.createModel.payrollAmount = this.calculateTotalAmount();
+      this.createModel.status = this.createModel.status;
+      this.createModel.cashRegisterId = this.createModel.cashRegisterId || null;
+      this.createModel.bankId = this.createModel.bankId || null;
+      this.createModel.bankDetailId = this.createModel.bankDetailId || '';
+      this.createModel.cashRegisterDetailId = this.createModel.cashRegisterDetailId || '';
       const averageMaturityDate = this.calculateAverageMaturity().toISOString().split('T')[0];
 
       const payload = {
@@ -109,6 +117,11 @@ export class ChequeissuePayrollComponent {
         description: this.createModel.description,
         checkCount: this.createModel.checkCount,
         averageMaturityDate: averageMaturityDate,
+        status: this.createModel.status,
+        cashRegisterId: this.createModel.cashRegisterId,
+        bankId: this.createModel.bankId,
+        bankDetailId: this.createModel.bankDetailId,
+        cashRegisterDetailId: this.createModel.cashRegisterDetailId,
         details: this.createModel.details.map(detail => ({
           id: detail.id,
           chequeissuePayrollId: detail.chequeissuePayrollId,
@@ -122,21 +135,23 @@ export class ChequeissuePayrollComponent {
           debtor: detail.debtor,
           creditor: detail.creditor,
           endorser: detail.endorser,
-          bankId: detail.bankId,
-          cashRegisterId: detail.cashRegisterId,
-          bankDetailId: detail.bankDetailId,
-          cashRegisterDetailId: detail.cashRegisterDetailId,
-          status: detail.status
         }))
       };
 
-      this.http.post<string>("ChequeissuePayroll/Create", payload, (res) => {
-        this.swal.callToast(res);
-        this.createModel = new ChequeissuePayrollModel()
-        this.createModel.date = this.date.transform(new Date(), "yyyy-MM-dd") ?? "";
-        this.createModalCloseBtn?.nativeElement.click();
-        this.getAll();
-      });
+      console.log("Gönderilen Payload:", JSON.stringify(payload, null, 2));
+
+      // Status kontrolü
+      if (this.createModel.status >= CheckStatusEnum.Paid && this.createModel.status <= CheckStatusEnum.InPortfolio) {
+        this.http.post<string>("ChequeissuePayroll/Create", payload, (res) => {
+          this.swal.callToast(res);
+          this.createModel = new ChequeissuePayrollModel();
+          this.createModel.date = this.date.transform(new Date(), "yyyy-MM-dd") ?? "";
+          this.createModalCloseBtn?.nativeElement.click();
+          this.getAll();
+        });
+      } else {
+        this.swal.callToast("Geçersiz işlem tipi seçildi.", "error");
+      }
     }
   }
 
@@ -185,11 +200,7 @@ export class ChequeissuePayrollComponent {
           debtor: detail.debtor,
           creditor: detail.creditor,
           endorser: detail.endorser,
-          bankId: detail.bankId,
-          cashRegisterId: detail.cashRegisterId,
-          bankDetailId: detail.bankDetailId,
-          cashRegisterDetailId: detail.cashRegisterDetailId,
-          status: detail.status
+
         }))
       };
 
@@ -221,11 +232,7 @@ export class ChequeissuePayrollComponent {
       debtor: this.createModel.debtor,
       creditor: this.createModel.creditor,
       endorser: this.createModel.endorser,
-      bankId: this.createModel.bankId|| null,
-      cashRegisterId: this.createModel.cashRegisterId|| null,
-      bankDetailId: this.createModel.bankDetailId || null,
-      cashRegisterDetailId: this.createModel.cashRegisterDetailId|| null,
-      status: this.createModel.status.Endorsed
+
     };
 
     this.createModel.details.push(detail);
@@ -241,7 +248,6 @@ export class ChequeissuePayrollComponent {
     this.createModel.creditor = '';
     this.createModel.endorser = '';
   }
-
 
   generateGuid() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -384,11 +390,7 @@ export class ChequeissuePayrollComponent {
       debtor: this.updateModel.debtor,
       creditor: this.updateModel.creditor,
       endorser: this.updateModel.endorser,
-      bankId: this.updateModel.bankId,
-      cashRegisterId: this.updateModel.cashRegisterId,
-      bankDetailId: this.updateModel.bankDetailId,
-      cashRegisterDetailId: this.updateModel.cashRegisterDetailId,
-      status: this.updateModel.statusValue
+
     };
 
     this.createModel.details.push(detail);
@@ -417,24 +419,54 @@ export class ChequeissuePayrollComponent {
       !this.createModel.debtor ||
       !this.createModel.creditor ||
       !this.createModel.endorser ||
-      !this.createModel.dueDate;
+      !this.createModel.dueDate ||
+      !this.createModel.status ||
+      !(this.createModel.customerId || this.createModel.bankId || this.createModel.cashRegisterId);
   }
   updateSelects() {
-    switch (Number(this.createModel.statusValue)) {
-      case 1:
+    console.log('Güncel createModel.status:', this.createModel.status);
+    switch (this.createModel.status) {
+      case CheckStatusEnum.Paid:  // Tahsil Edildi (1)
         this.isCashRegisterReadonly = false;
         this.isBankReadonly = true;
+        this.isCustomerReadonly = true;
+        this.createModel.customerId = this.customers[0]?.id || '';
         break;
-      case 5:
-      case 6:
-        this.isBankReadonly = false;
+
+      case CheckStatusEnum.Unpaid: // Karşılıksız (2)
+      case CheckStatusEnum.Endorsed: // Ciro (3)
+      case CheckStatusEnum.Returned: // İade (4)
         this.isCashRegisterReadonly = true;
-        break;
-      default:
         this.isBankReadonly = true;
+        this.isCustomerReadonly = false;
+        if (!this.createModel.customerId) {
+          this.createModel.customerId = this.customers[0]?.id || null; // Varsayılan olarak ilk müşteriyi seç veya null yap
+        }
+        break;
+
+
+      case CheckStatusEnum.Banked: // Bankaya Tahsile Verildi (5)
+      case CheckStatusEnum.SendToBankForCollateral: // Bankaya Teminata Verildi (6)
         this.isCashRegisterReadonly = true;
+        this.isBankReadonly = false;
+        this.isCustomerReadonly = true;
+        this.createModel.customerId = null;  // Müşteri ID'sini null yap
+        if (!this.createModel.bankId) {
+          this.createModel.bankId = this.banks[0]?.id || ""; // Varsayılan olarak ilk bankayı seç veya null yap
+        }
+        break;
+
+      case CheckStatusEnum.InPortfolio: // Portföyde (7)
+      default:
+        this.isCashRegisterReadonly = true;
+        this.isBankReadonly = true;
+        this.isCustomerReadonly = true;
+        this.createModel.customerId = null; // Müşteri ID'sini null yap
+        break;
     }
   }
+
+
 
   updateCheckDetails(checkId: string) {
     const selectedCheck = this.checks.find(check => check.id === checkId);
@@ -449,7 +481,49 @@ export class ChequeissuePayrollComponent {
       this.createModel.creditor = selectedCheck.creditor;
       this.createModel.endorser = selectedCheck.endorser;
       this.createModel.dueDate = selectedCheck.dueDate;
-    }
+    } }
+
+  resetForm() {
+    // createModel'i sıfırla
+    this.createModel = new ChequeissuePayrollModel();
+    this.createModel.date = this.date.transform(new Date(), "yyyy-MM-dd") ?? "";
+
+
+    // Diğer özellikleri sıfırla
+    this.isBankReadonly = true;
+    this.isCashRegisterReadonly = true;
+    this.isCustomerReadonly = true;
+    this.payrollNumberGenerated = false;
+
+    // Gerekirse yeni bir bordro numarası oluştur
+    this.generatePayrollNumber();
+
+    // Modal içerisindeki tüm input, select ve textarea elementlerini seç
+    const allInputs = document.querySelectorAll('#createModal input, #createModal select, #createModal textarea');
+
+    // Seçilen elementlerin değerlerini sıfırla
+    allInputs.forEach(input => {
+      if (input instanceof HTMLInputElement) {
+        input.value = ''; // Input elementlerinin değerini boşalt
+        input.name = ''; // Input elementlerinin name özelliğini boşalt
+      } else if (input instanceof HTMLSelectElement) {
+        input.selectedIndex = -1; // Select elementlerinin seçili değerini kaldır (boş yap)
+        input.name = ''; // Select elementlerinin name özelliğini boşalt
+      } else if (input instanceof HTMLTextAreaElement) {
+        input.value = ''; // Textarea elementlerinin değerini boşalt
+        input.name = ''; // Textarea elementlerinin name özelliğini boşalt
+      }
+    });
+
+
+  }
+  // Getter method
+  get checkStatusEnumValues() {
+    return Object.values(CheckStatusEnum).filter(value => typeof value === 'number') as CheckStatusEnum[];
   }
 
+
+
 }
+
+

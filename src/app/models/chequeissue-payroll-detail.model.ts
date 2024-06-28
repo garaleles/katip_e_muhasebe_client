@@ -1,3 +1,5 @@
+import {CheckStatusEnum} from "./chequeissue-payroll.model";
+
 export class ChequeissuePayrollDetailModel{
   id: string = '';
   chequeissuePayrollId: string = '';
@@ -10,11 +12,6 @@ export class ChequeissuePayrollDetailModel{
   debtor: string = '';
   creditor: string = '';
   endorser?: string = '';
-  bankId?: string | null = null;
-  bankDetailId?: string | null = null;
-  cashRegisterId?: string | null = null;
-  cashRegisterDetailId?: string | null = null;
-  status: number = 0;
   description?: string = '';
 }
 

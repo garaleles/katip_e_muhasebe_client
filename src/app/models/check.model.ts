@@ -5,8 +5,7 @@ import {CheckStatusEnum} from "./chequeissue-payroll.model";
 export class Check {
   id:string = '';
   checkType: CheckType = CheckType.Inward;
-  status: CheckStatusEnum = new CheckStatusEnum();
-  statusValue: number = 0;
+  status: CheckStatusEnum = CheckStatusEnum.InPortfolio;
   dueDate: string = '';
   checkNumber: string = '';
   bankName: string = '';
@@ -19,3 +18,4 @@ export class Check {
   checkRegisterPayrollId: string = '';
   checkDetails?: CheckDetail[];
 }
+

@@ -30,7 +30,8 @@
             <tr>
               <td>{{ $index + 1 }}</td>
               <td>{{ data.date }}</td>
-              <td>{{ data.customer.name || 'Kayıt Boş' }}</td>
+              <td *ngIf="data.customer">{{ data.customer.name }}</td>
+              <td *ngIf="!data.customer">Kayıt Boş</td>
               <td>{{ data.payrollNumber }}</td>
               <td>{{ data.payrollAmount | trCurrency: '₺': true }}</td>
               <td>
@@ -56,7 +57,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h3 class="modal-title fs-5">Çek Çıkış Bordrosu Ekle</h3>
-
+        <button type="button" class="btn btn-primary" (click)="resetForm()">Temizle</button>
         <button type="button" #createModalCloseBtn class="btn btn-outline-danger" data-dismiss="modal">
           <i class="fa-solid fa-x"></i>
         </button>
@@ -73,15 +74,13 @@
             </div>
             <div class="col-3">
               <label>İşlem Tipi</label>
-              <select class="form-control" [(ngModel)]="createModel.statusValue" required name="statusValue" (change)="updateSelects()">
-                <option [value]=1>Tahsil Edildi</option>
-                <option [value]=2>Karşılıksız</option>
-                <option [value]=3>Ciro</option>
-                <option [value]=4>İade</option>
-                <option [value]=5>Bankaya Tahsile Verildi</option>
-                <option [value]=6>Bankaya Teminata Verildi</option>
+              <select class="form-control" [(ngModel)]="createModel.status" required name="status" (change)="updateSelects()">
+                <option *ngFor="let status of checkStatusEnumValues" [ngValue]="status">
+                  {{ CheckStatusEnum[status] }}
+                </option>
               </select>
             </div>
+
             <div class="col-3">
               <div class="form-group">
                 <label>Tarih</label>
@@ -93,7 +92,7 @@
           <div class="row">
             <div class="col-6">
               <label>Cari</label>
-              <select class="form-control" [(ngModel)]="createModel.customerId" required name="customerId">
+              <select class="form-control" [(ngModel)]="createModel.customerId" name="customerId" [disabled]="isCustomerReadonly">
                 <option *ngFor="let customer of customers" [value]="customer.id">{{ customer.name }}</option>
               </select>
             </div>
@@ -109,14 +108,14 @@
           <div class="row">
             <div class="col-3">
               <label>Banka</label>
-              <select class="form-control" [(ngModel)]="createModel.bankId"  name="bankId" [disabled]="isBankReadonly">>
+              <select class="form-control" [(ngModel)]="createModel.bankId"  name="bankId" [disabled]="isBankReadonly">
                 <option *ngFor="let bank of banks" [value]="bank.id">{{ bank.name }}</option>
               </select>
             </div>
             <div class="col-3">
               <div class="form-group">
                 <label>Kasa</label>
-                <select class="form-control" [(ngModel)]="createModel.cashRegisterId"  name="cashRegisterId" [disabled]="isCashRegisterReadonly">>
+                <select class="form-control" [(ngModel)]="createModel.cashRegisterId"  name="cashRegisterId" [disabled]="isCashRegisterReadonly">
                   <option *ngFor="let cashRegister of cashRegisters" [value]="cashRegister.id">{{ cashRegister.name }}</option>
                 </select>
               </div>
@@ -133,35 +132,35 @@
             <div class="col-3">
               <div class="form-group">
                 <label>Banka</label>
-                <input type="text" [(ngModel)]="createModel.bankName" class="form-control" [ngModelOptions]="{standalone:true}">
+                <input type="text" [(ngModel)]="createModel.bankName" class="form-control" readonly [ngModelOptions]="{standalone:true}">
                 <div class="invalid-feedback"></div>
               </div>
             </div>
             <div class="col-3">
               <div class="form-group">
                 <label>Şube</label>
-                <input type="text" [(ngModel)]="createModel.branchName" class="form-control" [ngModelOptions]="{standalone:true}">
+                <input type="text" [(ngModel)]="createModel.branchName" class="form-control" readonly [ngModelOptions]="{standalone:true}">
                 <div class="invalid-feedback"></div>
               </div>
             </div>
             <div class="col-2">
               <div class="form-group">
                 <label>Hesap No</label>
-                <input type="text" [(ngModel)]="createModel.accountNumber" class="form-control" [ngModelOptions]="{standalone:true}">
+                <input type="text" [(ngModel)]="createModel.accountNumber" class="form-control" readonly [ngModelOptions]="{standalone:true}">
                 <div class="invalid-feedback"></div>
               </div>
             </div>
             <div class="col-2">
               <div class="form-group">
                 <label>Çek No</label>
-                <input type="text" [(ngModel)]="createModel.checkNumber" class="form-control" [ngModelOptions]="{standalone:true}">
+                <input type="text" [(ngModel)]="createModel.checkNumber" class="form-control" readonly [ngModelOptions]="{standalone:true}">
                 <div class="invalid-feedback"></div>
               </div>
             </div>
             <div class="col-2">
               <div class="form-group">
                 <label>Tutar</label>
-                <input type="number" [(ngModel)]="createModel.amount" class="form-control" [ngModelOptions]="{standalone:true}">
+                <input type="number" [(ngModel)]="createModel.amount" class="form-control" readonly [ngModelOptions]="{standalone:true}">
                 <div class="invalid-feedback"></div>
               </div>
             </div>
@@ -170,28 +169,28 @@
             <div class="col-3">
               <div class="form-group">
                 <label>Borçlusu</label>
-                <input type="text" [(ngModel)]="createModel.debtor" class="form-control" [ngModelOptions]="{standalone:true}">
+                <input type="text" [(ngModel)]="createModel.debtor" class="form-control" readonly [ngModelOptions]="{standalone:true}">
                 <div class="invalid-feedback"></div>
               </div>
             </div>
             <div class="col-3">
               <div class="form-group">
                 <label>Alacaklısı</label>
-                <input type="text" [(ngModel)]="createModel.creditor" class="form-control" [ngModelOptions]="{standalone:true}">
+                <input type="text" [(ngModel)]="createModel.creditor" class="form-control" readonly [ngModelOptions]="{standalone:true}">
                 <div class="invalid-feedback"></div>
               </div>
             </div>
             <div class="col-3">
               <div class="form-group">
                 <label>Ciranta</label>
-                <input type="text" [(ngModel)]="createModel.endorser" class="form-control" [ngModelOptions]="{standalone:true}">
+                <input type="text" [(ngModel)]="createModel.endorser" class="form-control" readonly [ngModelOptions]="{standalone:true}">
                 <div class="invalid-feedback"></div>
               </div>
             </div>
             <div class="col-2">
               <div class="form-group">
                 <label>Vade</label>
-                <input type="date" [(ngModel)]="createModel.dueDate" class="form-control" [ngModelOptions]="{standalone:true}">
+                <input type="date" [(ngModel)]="createModel.dueDate" class="form-control" readonly [ngModelOptions]="{standalone:true}">
                 <div class="invalid-feedback"></div>
               </div>
             </div>
