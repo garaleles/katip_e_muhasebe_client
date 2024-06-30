@@ -57,5 +57,13 @@ export enum CheckStatusEnum {
   InPortfolio = 7
 }
 
-
+export const CheckStatusEnumDescriptions = {
+  [CheckStatusEnum.Paid]: "Tahsil Edildi",
+  [CheckStatusEnum.Unpaid]: "Karşılıksız",
+  [CheckStatusEnum.Endorsed]: "Ciro",
+  [CheckStatusEnum.Returned]: "İade",
+  [CheckStatusEnum.Banked]: "Bankaya Tahsile Gönder",
+  [CheckStatusEnum.SendToBankForCollateral]: "Bankaya Teminata Gönder",
+  [CheckStatusEnum.InPortfolio]: "Portfoyde"
+};
 

@@ -5,6 +5,8 @@ import { ResultModel } from '../models/result.model';
 import { AuthService } from './auth.service';
 import { ErrorService } from './error.service';
 import { NgxSpinnerService } from 'ngx-spinner';
+import {Observable} from "rxjs";
+import {ChequeissuePayrollModel} from "../models/chequeissue-payroll.model";
 
 @Injectable({
   providedIn: 'root'
@@ -41,7 +43,9 @@ export class HttpService {
       }
     })
   }
-
+  getPayrollDetails(id: string): Observable<ChequeissuePayrollModel> {
+    return this.http.get<ChequeissuePayrollModel>(`/api/ChequeissuePayroll/${id}`);
+  }
   get<T>(apiUrl:string, callBack:(res:T)=> void,errorCallBack?:()=> void ){
     this.spinner.show();
     this.http.get<ResultModel<T>>(`${api}/${apiUrl}`,{

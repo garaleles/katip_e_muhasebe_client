@@ -76,7 +76,7 @@
               <label>İşlem Tipi</label>
               <select class="form-control" [(ngModel)]="createModel.status" required name="status" (change)="updateSelects()">
                 <option *ngFor="let status of checkStatusEnumValues" [ngValue]="status">
-                  {{ CheckStatusEnum[status] }}
+                  {{ CheckStatusEnumDescriptions[status] }}
                 </option>
               </select>
             </div>
@@ -93,9 +93,11 @@
             <div class="col-6">
               <label>Cari</label>
               <select class="form-control" [(ngModel)]="createModel.customerId" name="customerId" [disabled]="isCustomerReadonly">
+                <option value="">Lütfen seçim yapınız...</option>
                 <option *ngFor="let customer of customers" [value]="customer.id">{{ customer.name }}</option>
               </select>
             </div>
+
             <div class="col-6">
               <div class="form-group">
                 <label>Açıklama</label>
@@ -109,20 +111,25 @@
             <div class="col-3">
               <label>Banka</label>
               <select class="form-control" [(ngModel)]="createModel.bankId"  name="bankId" [disabled]="isBankReadonly">
+                <option value="">Lütfen seçim yapınız...</option>
                 <option *ngFor="let bank of banks" [value]="bank.id">{{ bank.name }}</option>
               </select>
             </div>
+
             <div class="col-3">
               <div class="form-group">
                 <label>Kasa</label>
                 <select class="form-control" [(ngModel)]="createModel.cashRegisterId"  name="cashRegisterId" [disabled]="isCashRegisterReadonly">
+                  <option value="">Lütfen seçim yapınız...</option>
                   <option *ngFor="let cashRegister of cashRegisters" [value]="cashRegister.id">{{ cashRegister.name }}</option>
                 </select>
               </div>
             </div>
+
             <div class="col-6">
               <label>Portfoy Çekleri</label>
               <select class="form-control" [(ngModel)]="createModel.checkId" required name="checkId" (ngModelChange)="updateCheckDetails(createModel.checkId)">
+                <option value="">Lütfen seçim yapınız...</option>
                 <option *ngFor="let check of checks" [value]="check.id">{{ check.debtor }} -- {{ check.dueDate| date: "dd-MM-yyyy" }} -- {{ check.amount | trCurrency: '₺': true  }}</option>
               </select>
             </div>
@@ -204,7 +211,7 @@
           </div>
           <hr>
           <div class="form-group mt-2">
-            <table id="payrollDetails" class="table table-hover">
+            <table id="payrollDetail" class="table table-hover">
               <thead>
               <tr>
                 <th>#</th>
@@ -289,7 +296,7 @@
 </div>
 
 <!-- Update Modal -->
-<!--<div class="modal fade" id="updateModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="updateModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-xl">
     <div class="modal-content">
       <div class="modal-header">
@@ -304,71 +311,106 @@
           <div class="row">
             <div class="col-6">
               <div class="form-group">
+                <label>Bordro Numarası</label>
+                <input type="text" [(ngModel)]="updateModel.payrollNumber" class="form-control" readonly name="updatePayrollNumber">
+              </div>
+            </div>
+            <div class="col-3">
+              <label>İşlem Tipi</label>
+              <select class="form-control" [(ngModel)]="updateModel.status" required name="updateStatus" (change)="updateSelects()">
+                <option *ngFor="let status of checkStatusEnumValues" [ngValue]="status">
+                  {{ CheckStatusEnumDescriptions[status] }}
+                </option>
+              </select>
+            </div>
+
+            <div class="col-3">
+              <div class="form-group">
                 <label>Tarih</label>
                 <input type="date" required [(ngModel)]="updateModel.date" class="form-control" name="updateDate">
               </div>
-              <div class="form-group">
-                <label>Cari</label>
-                <select class="form-control" [(ngModel)]="updateModel.customerId" required name="updateCustomerId">
-                  <option *ngFor="let customer of customers" [value]="customer.id">{{ customer.name }}</option>
-                </select>
-              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-6">
+              <label>Cari</label>
+              <select class="form-control" [(ngModel)]="updateModel.customerId" name="updateCustomerId" [disabled]="isCustomerReadonly">
+                <option value="">Lütfen seçim yapınız...</option>
+                <option *ngFor="let customer of customers" [value]="customer.id">{{ customer.name }}</option>
+              </select>
             </div>
 
             <div class="col-6">
-              <div class="form-group">
-                <label>Bordro Numarası</label>
-                <input type="text" class="form-control" readonly name="updatePayrollNumber"
-                       [value]="updateModel.payrollNumber">
-              </div>
-
-
               <div class="form-group">
                 <label>Açıklama</label>
                 <input type="text" [(ngModel)]="updateModel.description" class="form-control" name="updateDescription">
               </div>
             </div>
+
           </div>
 
+          <div class="row">
+            <div class="col-3">
+              <label>Banka</label>
+              <select class="form-control" [(ngModel)]="updateModel.bankId"  name="updateBankId" [disabled]="isBankReadonly">
+                <option value="">Lütfen seçim yapınız...</option>
+                <option *ngFor="let bank of banks" [value]="bank.id">{{ bank.name }}</option>
+              </select>
+            </div>
+
+            <div class="col-3">
+              <div class="form-group">
+                <label>Kasa</label>
+                <select class="form-control" [(ngModel)]="updateModel.cashRegisterId"  name="updateCashRegisterId" [disabled]="isCashRegisterReadonly">
+                  <option value="">Lütfen seçim yapınız...</option>
+                  <option *ngFor="let cashRegister of cashRegisters" [value]="cashRegister.id">{{ cashRegister.name }}</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="col-6">
+              <label>Portfoy Çekleri</label>
+              <select class="form-control" [(ngModel)]="updateModel.checkId" name="updateCheckId" (ngModelChange)="updateCheckDetailsUp(updateModel.checkId)">
+                <option value="">Lütfen seçim yapınız...</option>
+                <option *ngFor="let check of checks" [value]="check.id">{{ check.debtor }} -- {{ check.dueDate| date: "dd-MM-yyyy" }} -- {{ check.amount | trCurrency: '₺': true  }}</option>
+              </select>
+            </div>
+          </div>
           <hr>
           <div class="row">
             <div class="col-3">
               <div class="form-group">
                 <label>Banka</label>
-                <input type="text" [(ngModel)]="updateModel.bankName" class="form-control"
-                       [ngModelOptions]="{standalone:true}">
+                <input type="text" [(ngModel)]="updateModel.bankName" class="form-control" readonly [ngModelOptions]="{standalone:true}">
                 <div class="invalid-feedback"></div>
               </div>
             </div>
             <div class="col-3">
               <div class="form-group">
                 <label>Şube</label>
-                <input type="text" [(ngModel)]="updateModel.branchName" class="form-control"
-                       [ngModelOptions]="{standalone:true}">
+                <input type="text" [(ngModel)]="updateModel.branchName" class="form-control" readonly [ngModelOptions]="{standalone:true}">
                 <div class="invalid-feedback"></div>
               </div>
             </div>
             <div class="col-2">
               <div class="form-group">
                 <label>Hesap No</label>
-                <input type="text" [(ngModel)]="updateModel.accountNumber" class="form-control"
-                       [ngModelOptions]="{standalone:true}">
+                <input type="text" [(ngModel)]="updateModel.accountNumber" class="form-control" readonly [ngModelOptions]="{standalone:true}">
                 <div class="invalid-feedback"></div>
               </div>
             </div>
             <div class="col-2">
               <div class="form-group">
                 <label>Çek No</label>
-                <input type="text" [(ngModel)]="updateModel.checkNumber" class="form-control"
-                       [ngModelOptions]="{standalone:true}">
+                <input type="text" [(ngModel)]="updateModel.checkNumber" class="form-control" readonly [ngModelOptions]="{standalone:true}">
                 <div class="invalid-feedback"></div>
               </div>
             </div>
             <div class="col-2">
               <div class="form-group">
                 <label>Tutar</label>
-                <input type="number" [(ngModel)]="updateModel.amount" class="form-control"
-                       [ngModelOptions]="{standalone:true}">
+                <input type="number" [(ngModel)]="updateModel.amount" class="form-control" readonly [ngModelOptions]="{standalone:true}">
                 <div class="invalid-feedback"></div>
               </div>
             </div>
@@ -377,38 +419,34 @@
             <div class="col-3">
               <div class="form-group">
                 <label>Borçlusu</label>
-                <input type="text" [(ngModel)]="updateModel.debtor" class="form-control"
-                       [ngModelOptions]="{standalone:true}">
+                <input type="text" [(ngModel)]="updateModel.debtor" class="form-control" readonly [ngModelOptions]="{standalone:true}">
                 <div class="invalid-feedback"></div>
               </div>
             </div>
             <div class="col-3">
               <div class="form-group">
                 <label>Alacaklısı</label>
-                <input type="text" [(ngModel)]="updateModel.creditor" class="form-control"
-                       [ngModelOptions]="{standalone:true}">
+                <input type="text" [(ngModel)]="updateModel.creditor" class="form-control" readonly [ngModelOptions]="{standalone:true}">
                 <div class="invalid-feedback"></div>
               </div>
             </div>
             <div class="col-3">
               <div class="form-group">
                 <label>Ciranta</label>
-                <input type="text" [(ngModel)]="updateModel.endorser" class="form-control"
-                       [ngModelOptions]="{standalone:true}">
+                <input type="text" [(ngModel)]="updateModel.endorser" class="form-control" readonly [ngModelOptions]="{standalone:true}">
                 <div class="invalid-feedback"></div>
               </div>
             </div>
             <div class="col-2">
               <div class="form-group">
                 <label>Vade</label>
-                <input type="date" [(ngModel)]="updateModel.dueDate" class="form-control"
-                       [ngModelOptions]="{standalone:true}">
+                <input type="date" [(ngModel)]="updateModel.dueDate" class="form-control" readonly [ngModelOptions]="{standalone:true}">
                 <div class="invalid-feedback"></div>
               </div>
             </div>
             <div class="col-1">
               <label>İşlemler</label>
-              <button type="button" class="btn btn-danger w-100" (click)="addDetailUp()">
+              <button type="button" class="btn btn-danger w-100" (click)="addDetailUp()" [disabled]="isFormIncompleteUp()">
                 <i class="fa-solid fa-plus me-1"></i>
                 Ekle
               </button>
@@ -501,5 +539,5 @@
       </form>
     </div>
   </div>
-</div>-->
+</div>
 
