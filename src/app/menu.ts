@@ -123,6 +123,14 @@ export const Menus: MenuModel[] = [
     showThisMenuJustAdmin: false
   },
   {
+    name: "Firma Çekleri Bordroları",
+    icon: "fas fa-wallet",
+    url: "/company-checkissue-payrolls",
+    isTitle: false,
+    subMenus: [],
+    showThisMenuJustAdmin: false
+  },
+  {
     name: "Giderler",
     icon: "fa-solid fa-coins",
     url: "/expenses",

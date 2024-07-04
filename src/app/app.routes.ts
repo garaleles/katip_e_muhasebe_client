@@ -25,6 +25,12 @@ import {
 } from "./components/product-profitability-report/product-profitability-report.component";
 import {CheckRegisterPayrollComponent} from "./components/check-register-payroll/check-register-payroll.component";
 import {ChequeissuePayrollComponent} from "./components/chequeissue-payroll/chequeissue-payroll.component";
+import {
+  CompanyCheckissuePayrollComponent
+} from "./components/company-checkissue-payroll/company-checkissue-payroll.component";
+import {
+  CompanyCheckissuePayrollDetailComponent
+} from "./components/company-checkissue-payroll-detail/company-checkissue-payroll-detail.component";
 
 
 export const routes: Routes = [
@@ -179,7 +185,19 @@ export const routes: Routes = [
           }
         ]
       },
-
+      {
+        path: "company-checkissue-payrolls",
+        children: [
+          {
+            path: "",
+            component: CompanyCheckissuePayrollComponent
+          },
+          {
+            path: "details/:id",
+            component: CompanyCheckissuePayrollDetailComponent
+          }
+        ]
+      },
 
     ]
   },
