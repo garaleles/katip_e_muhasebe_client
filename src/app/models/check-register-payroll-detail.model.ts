@@ -11,4 +11,5 @@ export class CheckRegisterPayrollDetail {
   debtor: string = '';
   creditor: string = '';
   endorser: string = '';
+  updatedDate?: string = '';
 }

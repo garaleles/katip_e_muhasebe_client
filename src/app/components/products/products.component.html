@@ -8,20 +8,20 @@
         </button>
         <button class="btn btn-success" (click)="exportToExcel()" style="margin-left: 5px">
           <i class="fa-solid fa-file-excel me-1"></i>
-          Excel'e Aktar
+          Exc. Aktar
         </button>
       </div>
       <div class="col-7">
         <div style="display: flex; align-items: center;">
           <button class="btn btn-success" (click)="exportTemplate()" >
             <i class="fa-solid fa-file-excel me-1"></i>
-           Yükleme Şablonu
+           Y.Şablonu
           </button>
           <input style="margin-left: 5px;" type="file" (change)="importFile($event)">
 
           <button style="margin-left: 5px" class="btn btn-success" (click)="exportUpdateTemplate()">
             <i class="fa-solid fa-file-excel me-1"></i>
-            Güncelleme Şablonu
+            G.Şablonu
           </button>
           <input style="margin-left: 5px;" type="file" (change)="importAndUpdateFile($event)">
         </div>

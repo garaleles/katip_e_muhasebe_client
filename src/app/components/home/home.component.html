@@ -61,9 +61,33 @@
         </div>
         <div class="col-4" style="background-color: #00a379; border: 1.5px solid black">
           <div class="d-flex justify-content-center">
-            <app-card [title]="'Menkul Değerler(Kasa+Banka)'" [value]="totalCash + totalBanks"></app-card>
+            <app-card [title]="'Portfoydeki Alacak Çekleri'" [value]="totalCustomerChecks"></app-card>
           </div>
         </div>
+
+      </div>
+    </section>
+
+    <section style="width: 80%; height: auto">
+
+      <hr>
+      <div class="row">
+        <div class="col-4" style="background-color: #00a379; border: 1.5px solid black">
+          <div class="d-flex justify-content-center">
+            <app-card [title]="'Boş'" [value]="totalCash"></app-card>
+          </div>
+        </div>
+        <div class="col-4" style="background-color: #BD362F; border: 1.5px solid black">
+          <div class="d-flex justify-content-center">
+            <app-card [title]="'Boş'" [value]="totalBanks"></app-card>
+          </div>
+        </div>
+        <div class="col-4" style="background-color: #00a379; border: 1.5px solid black">
+          <div class="d-flex justify-content-center">
+            <app-card [title]="'Ödenecek Firma Çekleri'" [value]="totalCompanyChecks"></app-card>
+          </div>
+        </div>
+
       </div>
     </section>
 

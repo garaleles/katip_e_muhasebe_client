@@ -16,6 +16,7 @@ export class Check {
   creditor: string = '';
   endorser: string = '';
   checkRegisterPayrollId: string = '';
+  updatedDate?: string = '';
   checkDetails?: CheckDetail[];
 }
 

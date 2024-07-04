@@ -125,7 +125,8 @@ export class CheckRegisterPayrollComponent implements OnInit{
           description: detail.description,
           debtor: detail.debtor,
           creditor: detail.creditor,
-          endorser: detail.endorser
+          endorser: detail.endorser,
+          updatedDate: new Date().toISOString()
         }))
       };
 
@@ -183,7 +184,8 @@ export class CheckRegisterPayrollComponent implements OnInit{
           description: detail.description,
           debtor: detail.debtor,
           creditor: detail.creditor,
-          endorser: detail.endorser
+          endorser: detail.endorser,
+          updatedDate: new Date().toISOString()
         }))
       };
 
@@ -214,7 +216,9 @@ export class CheckRegisterPayrollComponent implements OnInit{
       description: this.createModel.description,
       debtor: this.createModel.debtor,
       creditor: this.createModel.creditor,
-      endorser: this.createModel.endorser
+      endorser: this.createModel.endorser,
+      updatedDate: new Date().toISOString()
+
     };
 
     this.createModel.details.push(detail);
@@ -374,7 +378,8 @@ export class CheckRegisterPayrollComponent implements OnInit{
       description: this.updateModel.description,
       debtor: this.updateModel.debtor,
       creditor: this.updateModel.creditor,
-      endorser: this.updateModel.endorser
+      endorser: this.updateModel.endorser,
+      updatedDate: new Date().toISOString()
     };
 
     this.updateModel.details.push(detail);

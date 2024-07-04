@@ -16,4 +16,5 @@ export class CheckDetail {
   debtor: string = '';
   creditor: string = '';
   endorser: string = '';
+  updatedDate?: string = '';
 }
