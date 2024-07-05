@@ -319,6 +319,12 @@
     <div class="modal-content">
       <div class="modal-header">
         <h3 class="modal-title fs-5">Fatura Güncelleme Formu</h3>
+
+        <button class="btn btn-dark" (click)="exportToPdfUp()" style="margin-left: 5px">
+          <i class="fa-solid fa-file-pdf me-1"></i>
+          PDF'e Aktar
+        </button>
+
         <button type="button" #updateModalCloseBtn class="btn btn-outline-danger" data-dismiss="modal">
           <i class="fa-solid fa-x"></i>
         </button>

@@ -9,6 +9,21 @@ import {SharedModule} from "../../modules/shared.module";
 import {CheckRegisterPayrollPipe} from "../../pipes/check-register-payroll.pipe";
 import {CompanyCheckissuePayrollPipe} from "../../pipes/company-checkissue-payroll.pipe";
 import {CompanyCheckissuePayrollModel} from "../../models/company-checkissue-payroll.model";
+import * as XLSX from "xlsx";
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+
+
+
+// `uint8ArrayToBase64` fonksiyonu
+function uint8ArrayToBase64(uint8Array: Uint8Array): string {
+  let binary = '';
+  const len = uint8Array.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(uint8Array[i]);
+  }
+  return btoa(binary);
+}
 
 
 @Component({
@@ -342,38 +357,22 @@ export class CompanyCheckissuePayrollComponent {
   }
 
 
-  updateCalculateAverageMaturity(details: CompanyCheckAccount[]): void {
-    if (!details || details.length === 0) {
-      return; // Detaylar boşsa çık
+  updateCalculateAverageMaturity(details: CompanyCheckAccount[]): Date {
+    if (!details || this.updateCalculateTotalAmount(details) === 0) {
+      return new Date(); // If details array is not defined or total amount is 0, return current date
     }
 
-    const totalAmount = this.updateCalculateTotalAmount(details); // details argümanını kullan
-    if (totalAmount === 0) {
-      return; // Toplam tutar sıfırsa çık
-    }
-
-    const totalDays = details.reduce((total, detail) => { // details argümanını kullan
-      // Tarih formatını düzeltme (varsayılan format: yyyy-MM-dd)
-      const dueDateParts = detail.dueDate.split('-');
-      const dueDate = new Date(
-        parseInt(dueDateParts[0], 10),
-        parseInt(dueDateParts[1], 10) - 1,
-        parseInt(dueDateParts[2], 10)
-      );
-
-      // Bugünün tarihi ile vade tarihi arasındaki gün farkını hesaplama
-      const today = new Date();
-      const diffTime = dueDate.getTime() - today.getTime();
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-      return total + diffDays * detail.amount; // Ağırlıklı toplam
+    const totalAmount = this.updateCalculateTotalAmount(details);
+    const totalDays = details.reduce((total, detail) => {
+      const dueDate = new Date(detail.dueDate);
+      const days = dueDate.getTime() / (1000 * 60 * 60 * 24);
+      return total + days * detail.amount;
     }, 0);
 
     const averageDays = totalDays / totalAmount;
-    const averageDate = new Date();
-    averageDate.setDate(averageDate.getDate() + Math.round(averageDays));
+    const averageDate = new Date(averageDays * 1000 * 60 * 60 * 24);
 
-    this.updateModel.averageMaturityDate = averageDate.toISOString().split('T')[0];
+    return averageDate; // Return the average maturity date as a Date object
   }
 
 
@@ -421,5 +420,142 @@ export class CompanyCheckissuePayrollComponent {
       !this.createModel.dueDate;
   }
 
+  exportToExcel() {
+    const dataToExport = (this.companyCheckissuePayrolls).map((data, index) => {
+      return {
+        '#': index + 1,
+        'Bordro No:': data.payrollNumber,
+        'Cari': data.customer?.name,
+        'Tarih': data.date,
+        'Toplam Çek Adedi': data.checkCount,
+        'Ortalama Vade Tarihi': data.averageMaturityDate,
+        'Bordro Tutarı': data.payrollAmount,
+      };
+    });
+
+    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(dataToExport);
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Firma Çeki Çıkış Bordrosu');
+    XLSX.writeFile(wb, 'GelenCekler.xlsx');
+  }
+  async loadDejaVuSansFont(doc: jsPDF) {
+    try {
+      const fontUrl = 'assets/fonts/DejaVuSans.ttf';
+      const response = await fetch(fontUrl);
+
+      if (!response.ok) {
+        throw new Error(`Failed to load font from ${fontUrl}: ${response.statusText}`);
+      }
+
+      const font = await response.arrayBuffer();
+      const fontUint8Array = new Uint8Array(font);
+
+      const base64String = uint8ArrayToBase64(fontUint8Array);
+
+      doc.addFileToVFS('DejaVuSans.ttf', base64String);
+      doc.addFont('DejaVuSans.ttf', 'DejaVuSans', 'normal');
+    } catch (error) {
+      console.error('Error loading font:', error);
+    }
+  }
+  async exportToPdf() {
+    const doc = new jsPDF();
+    await this.loadDejaVuSansFont(doc);
+
+    const pageWidth = doc.internal.pageSize.width;
+    const formattedDate = new Date(this.createModel.date).toLocaleDateString('tr-TR');
+
+    // DejaVu Sans fontunu kullan
+    doc.setFont('DejaVuSans');
+
+    // Header
+    doc.setFontSize(16);
+    doc.text('Firma Çeki Çıkış Bordrosu', pageWidth / 2, 20, { align: 'center' });
+
+    doc.setFontSize(10);
+    doc.text(`Bordro No: ${this.createModel.payrollNumber}`, 20, 30);
+    doc.text(`Tarih: ${formattedDate}`, 20, 40);
+    doc.text(`Cari Hesap: ${this.customers.find(c => c.id === this.createModel.customerId)?.name || ''}`, 20, 60);
+
+    // Details Table
+    autoTable(doc, {
+      startY: 70,
+      head: [['#', 'Çek No', 'Banka', 'Şube', 'Hesap No', 'Vade','Tutar']],
+      body: this.createModel.details.map((d, i) => [
+        i + 1,
+        d.checkNumber,
+        d.bankName,
+        d.branchName,
+        d.accountNumber,
+        new Date(d.dueDate).toLocaleDateString('tr-TR'),
+        this.formatCurrency(d.amount)
+      ]),
+      styles: { font: 'DejaVuSans', halign: 'left', fontSize: 10 },
+      columnStyles: { 0: { halign: 'center' } }
+    });
+
+    // Footer (Totals)
+    const tableEndY = (doc as any).lastAutoTable.finalY;
+    const rightMargin = 30;
+    doc.setFontSize(10);
+    doc.text(`Çek Sayısı: ${this.calculateCheckCount(this.createModel.details)}`, pageWidth - 80 + rightMargin, tableEndY + 10, { align: 'right' });
+    doc.text(`Ortalama Vade: ${new Date(this.calculateAverageMaturity(this.createModel.details)).toLocaleDateString('tr-TR')}`, pageWidth - 80 + rightMargin, tableEndY + 20, { align: 'right' });
+    doc.text(`Bordro Tutarı: ${this.formatCurrency(this.calculateTotalAmount(this.createModel.details))}`, pageWidth - 80 + rightMargin, tableEndY + 30, { align: 'right' });
+
+    doc.save('GCekBordro.pdf');
+  }
+
+
+  formatCurrency(value: number): string {
+    return value.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+  }
+
+
+  async exportToPdfUp() {
+    const doc = new jsPDF();
+    await this.loadDejaVuSansFont(doc);
+
+    const pageWidth = doc.internal.pageSize.width;
+    const formattedDate = new Date(this.updateModel.date).toLocaleDateString('tr-TR');
+
+    // DejaVu Sans fontunu kullan
+    doc.setFont('DejaVuSans');
+
+    // Header
+    doc.setFontSize(16);
+    doc.text('Firma Çeki Çıkış Bordrosu', pageWidth / 2, 20, { align: 'center' });
+
+    doc.setFontSize(10);
+    doc.text(`Bordro No: ${this.updateModel.payrollNumber}`, 20, 30);
+    doc.text(`Tarih: ${formattedDate}`, 20, 40);
+    doc.text(`Cari Hesap: ${this.customers.find(c => c.id === this.updateModel.customerId)?.name || ''}`, 20, 60);
+
+    // Details Table
+    autoTable(doc, {
+      startY: 70,
+      head: [['#', 'Çek No', 'Banka', 'Şube', 'Hesap No', 'Vade', 'Tutar']],
+      body: this.updateModel.details.map((d, i) => [
+        i + 1,
+        d.checkNumber,
+        d.bankName,
+        d.branchName,
+        d.accountNumber,
+        new Date(d.dueDate).toLocaleDateString('tr-TR'),
+        this.formatCurrency(d.amount)
+      ]),
+      styles: { font: 'DejaVuSans', halign: 'left', fontSize: 10 },
+      columnStyles: { 0: { halign: 'center' } }
+    });
+
+    // Footer (Totals)
+    const tableEndY = (doc as any).lastAutoTable.finalY;
+    const rightMargin = 30;
+    doc.setFontSize(10);
+    doc.text(`Çek Sayısı: ${this.updateCalculateCheckCount(this.updateModel.details)}`, pageWidth - 80 + rightMargin, tableEndY + 10, { align: 'right' });
+    doc.text(`Ortalama Vade: ${this.updateCalculateAverageMaturity(this.updateModel.details).toLocaleDateString('tr-TR')}`, pageWidth - 80 + rightMargin, tableEndY + 20, { align: 'right' });
+    doc.text(`Bordro Tutarı: ${this.formatCurrency(this.updateCalculateTotalAmount(this.updateModel.details))}`, pageWidth - 80 + rightMargin, tableEndY + 30, { align: 'right' });
+
+    doc.save('GCekBordro.pdf');
+  }
 
 }

@@ -12,7 +12,21 @@ import {CheckStatusEnumDescriptions, ChequeissuePayrollModel} from "../../models
 import {NgForm} from "@angular/forms";
 import {ChequeissuePayrollDetailModel} from "../../models/chequeissue-payroll-detail.model";
 import { CheckStatusEnum } from '../../models/chequeissue-payroll.model';
-import {Observable} from "rxjs";
+import * as XLSX from "xlsx";
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+
+
+
+// `uint8ArrayToBase64` fonksiyonu
+function uint8ArrayToBase64(uint8Array: Uint8Array): string {
+  let binary = '';
+  const len = uint8Array.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(uint8Array[i]);
+  }
+  return btoa(binary);
+}
 
 @Component({
   selector: 'app-chequeissue-payroll',
@@ -377,9 +391,9 @@ export class ChequeissuePayrollComponent implements OnInit{
   }
 
 
-  updateCalculateAverageMaturity(): void {
+  updateCalculateAverageMaturity(): Date {
     if (!this.updateModel.details || this.updateCalculateTotalAmount() === 0) {
-      return; // Eğer details array tanımlı değilse veya toplam tutar 0 ise, fonksiyondan çık
+      return new Date(); // Eğer details array tanımlı değilse veya toplam tutar 0 ise, şimdiki tarihi döndür
     }
 
     const totalAmount = this.updateCalculateTotalAmount();
@@ -392,9 +406,8 @@ export class ChequeissuePayrollComponent implements OnInit{
     const averageDays = totalDays / totalAmount;
     const averageDate = new Date(averageDays * 1000 * 60 * 60 * 24);
 
-    this.updateModel.averageMaturityDate = averageDate.toISOString().split('T')[0]; // ISO string formatına çevirip sadece tarihi al
+    return averageDate; // Ortalama vade tarihini Date olarak döndür
   }
-
 
 
   removeDetailItemUp(index: number) {
@@ -585,5 +598,146 @@ export class ChequeissuePayrollComponent implements OnInit{
       !this.updateModel.status ||
       !(this.updateModel.customerId || this.updateModel.bankId || this.updateModel.cashRegisterId);
   }
+
+  exportToExcel() {
+    const dataToExport = (this.chequeissuePayrolls).map((data, index) => {
+      return {
+        '#': index + 1,
+        'Bordro No:': data.payrollNumber,
+        'Cari': data.customer?.name,
+        'Tarih': data.date,
+        'Toplam Çek Adedi': data.checkCount,
+        'Ortalama Vade Tarihi': data.averageMaturityDate,
+        'Bordro Tutarı': data.payrollAmount,
+      };
+    });
+
+    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(dataToExport);
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Çek Çıkış Bordrosu');
+    XLSX.writeFile(wb, 'ÇıkanCekler.xlsx');
+  }
+  async loadDejaVuSansFont(doc: jsPDF) {
+    try {
+      const fontUrl = 'assets/fonts/DejaVuSans.ttf';
+      const response = await fetch(fontUrl);
+
+      if (!response.ok) {
+        throw new Error(`Failed to load font from ${fontUrl}: ${response.statusText}`);
+      }
+
+      const font = await response.arrayBuffer();
+      const fontUint8Array = new Uint8Array(font);
+
+      const base64String = uint8ArrayToBase64(fontUint8Array);
+
+      doc.addFileToVFS('DejaVuSans.ttf', base64String);
+      doc.addFont('DejaVuSans.ttf', 'DejaVuSans', 'normal');
+    } catch (error) {
+      console.error('Error loading font:', error);
+    }
+  }
+  async exportToPdf() {
+    const doc = new jsPDF();
+    await this.loadDejaVuSansFont(doc);
+
+    const pageWidth = doc.internal.pageSize.width;
+    const formattedDate = new Date(this.createModel.date).toLocaleDateString('tr-TR');
+
+    // DejaVu Sans fontunu kullan
+    doc.setFont('DejaVuSans');
+
+    // Header
+    doc.setFontSize(16);
+    doc.text('Çek Çıkış Bordrosu', pageWidth / 2, 20, { align: 'center' });
+
+    doc.setFontSize(10);
+    doc.text(`Bordro No: ${this.createModel.payrollNumber}`, 20, 30);
+    doc.text(`Tarih: ${formattedDate}`, 20, 40);
+    doc.text(`Cari Hesap: ${this.customers.find(c => c.id === this.createModel.customerId)?.name || ''}`, 20, 60);
+
+    // Details Table
+    autoTable(doc, {
+      startY: 70,
+      head: [['#', 'Çek No', 'Banka', 'Şube', 'Hesap No', 'Vade','Borçlusu', 'Tutar']],
+      body: this.createModel.details.map((d, i) => [
+        i + 1,
+        d.checkNumber,
+        d.bankName,
+        d.branchName,
+        d.accountNumber,
+        new Date(d.dueDate).toLocaleDateString('tr-TR'),
+        d.debtor,
+        this.formatCurrency(d.amount)
+      ]),
+      styles: { font: 'DejaVuSans', halign: 'left', fontSize: 10 },
+      columnStyles: { 0: { halign: 'center' } }
+    });
+
+    // Footer (Totals)
+    const tableEndY = (doc as any).lastAutoTable.finalY;
+    const rightMargin = 30;
+    doc.setFontSize(10);
+    doc.text(`Çek Sayısı: ${this.calculateCheckCount()}`, pageWidth - 80 + rightMargin, tableEndY + 10, { align: 'right' });
+    doc.text(`Ortalama Vade: ${new Date(this.calculateAverageMaturity()).toLocaleDateString('tr-TR')}`, pageWidth - 80 + rightMargin, tableEndY + 20, { align: 'right' });
+    doc.text(`Bordro Tutarı: ${this.formatCurrency(this.calculateTotalAmount())}`, pageWidth - 80 + rightMargin, tableEndY + 30, { align: 'right' });
+
+    doc.save('GCekBordro.pdf');
+  }
+
+
+  formatCurrency(value: number): string {
+    return value.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+  }
+
+
+  async exportToPdfUp() {
+    const doc = new jsPDF();
+    await this.loadDejaVuSansFont(doc);
+
+    const pageWidth = doc.internal.pageSize.width;
+    const formattedDate = new Date(this.updateModel.date).toLocaleDateString('tr-TR');
+
+    // DejaVu Sans fontunu kullan
+    doc.setFont('DejaVuSans');
+
+    // Header
+    doc.setFontSize(16);
+    doc.text('Çek Çıkış Bordrosu', pageWidth / 2, 20, { align: 'center' });
+
+    doc.setFontSize(10);
+    doc.text(`Bordro No: ${this.updateModel.payrollNumber}`, 20, 30);
+    doc.text(`Tarih: ${formattedDate}`, 20, 40);
+    doc.text(`Cari Hesap: ${this.customers.find(c => c.id === this.updateModel.customerId)?.name || ''}`, 20, 60);
+
+    // Details Table
+    autoTable(doc, {
+      startY: 70,
+      head: [['#', 'Çek No', 'Banka', 'Şube', 'Hesap No', 'Vade','Borçlusu', 'Tutar']],
+      body: this.updateModel.details.map((d, i) => [
+        i + 1,
+        d.checkNumber,
+        d.bankName,
+        d.branchName,
+        d.accountNumber,
+        new Date(d.dueDate).toLocaleDateString('tr-TR'),
+        d.debtor,
+        this.formatCurrency(d.amount)
+      ]),
+      styles: { font: 'DejaVuSans', halign: 'left', fontSize: 10 },
+      columnStyles: { 0: { halign: 'center' } }
+    });
+
+    // Footer (Totals)
+    const tableEndY = (doc as any).lastAutoTable.finalY;
+    const rightMargin = 30;
+    doc.setFontSize(10);
+    doc.text(`Çek Sayısı: ${this.updateCalculateCheckCount()}`, pageWidth - 80 + rightMargin, tableEndY + 10, { align: 'right' });
+    doc.text(`Ortalama Vade: ${new Date(this.updateCalculateAverageMaturity()).toLocaleDateString('tr-TR')}`, pageWidth - 80 + rightMargin, tableEndY + 20, { align: 'right' });
+    doc.text(`Bordro Tutarı: ${this.formatCurrency(this.updateCalculateTotalAmount())}`, pageWidth - 80 + rightMargin, tableEndY + 30, { align: 'right' });
+
+    doc.save('GCekBordro.pdf');
+  }
+
   protected readonly CheckStatusEnumDescriptions = CheckStatusEnumDescriptions;
 }

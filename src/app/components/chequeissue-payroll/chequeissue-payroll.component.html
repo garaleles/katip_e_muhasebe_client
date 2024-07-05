@@ -6,6 +6,11 @@
           <i class="fa-solid fa-plus me-1"></i>
           Bordro Ekle
         </button>
+
+        <button class="btn btn-success" (click)="exportToExcel()" style="margin-left: 5px">
+          <i class="fa-solid fa-file-excel me-1"></i>
+          Excel'e Aktar
+        </button>
       </div>
 
       <div class="col-3">
@@ -57,6 +62,12 @@
     <div class="modal-content">
       <div class="modal-header">
         <h3 class="modal-title fs-5">Çek Çıkış Bordrosu Ekle</h3>
+
+        <button class="btn btn-dark" (click)="exportToPdf()" style="margin-left: 5px">
+          <i class="fa-solid fa-file-pdf me-1"></i>
+          PDF'e Aktar
+        </button>
+
         <button type="button" class="btn btn-primary" (click)="resetForm()">Temizle</button>
         <button type="button" #createModalCloseBtn class="btn btn-outline-danger" data-dismiss="modal">
           <i class="fa-solid fa-x"></i>
@@ -301,6 +312,12 @@
     <div class="modal-content">
       <div class="modal-header">
         <h3 class="modal-title fs-5">Bordro Güncelleme Formu</h3>
+
+        <button class="btn btn-dark" (click)="exportToPdfUp()" style="margin-left: 5px">
+          <i class="fa-solid fa-file-pdf me-1"></i>
+          PDF'e Aktar
+        </button>
+
         <button type="button" #updateModalCloseBtn class="btn btn-outline-danger" data-dismiss="modal">
           <i class="fa-solid fa-x"></i>
         </button>

@@ -14,7 +14,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
 
-// `uint8ArrayToBase64` fonksiyonunu burada tanımlayın
+// `uint8ArrayToBase64` fonksiyonu
 function uint8ArrayToBase64(uint8Array: Uint8Array): string {
   let binary = '';
   const len = uint8Array.byteLength;
@@ -423,6 +423,57 @@ export class InvoiceComponent {
   formatCurrency(value: number): string {
     return value.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
   }
+
+  async exportToPdfUp() {
+    const doc = new jsPDF();
+    await this.loadDejaVuSansFont(doc);
+
+    const pageWidth = doc.internal.pageSize.width;
+    const formattedDate = new Date(this.updateModel.date).toLocaleDateString('tr-TR');
+
+    // DejaVu Sans fontunu kullan
+    doc.setFont('DejaVuSans');
+
+    // Header
+    doc.setFontSize(16);
+    doc.text('Fatura', pageWidth / 2, 20, { align: 'center' });
+
+    doc.setFontSize(10);
+    doc.text(`Fatura No: ${this.updateModel.invoiceNumber}`, 20, 30);
+    doc.text(`Tarih: ${formattedDate}`, 20, 40);
+    doc.text(`Fatura Tipi: ${this.updateModel.typeValue == 1 ? 'Alış' : 'Satış'}`, 20, 50);
+    doc.text(`Cari Hesap: ${this.customers.find(c => c.id === this.updateModel.customerId)?.name || ''}`, 20, 60);
+
+    // Details Table
+    autoTable(doc, {
+      startY: 70,
+      head: [['#', 'Stok ismi', 'Miktar', 'Fiyat', 'Isk. %', 'Kdv %', 'Brüt Tutar']],
+      body: this.updateModel.details.map((d, i) => [
+        i + 1,
+        d.product.name,
+        d.quantity,
+        this.formatCurrency(d.price),
+        d.discountRate,
+        d.taxRate,
+        this.formatCurrency(d.quantity * d.price),
+      ]),
+      styles: { font: 'DejaVuSans', halign: 'left', fontSize: 10 },
+      columnStyles: { 0: { halign: 'center' } }
+    });
+
+    // Footer (Totals)
+    const tableEndY = (doc as any).lastAutoTable.finalY;
+    const rightMargin = 30;
+    doc.setFontSize(10);
+    doc.text(`Brüt Tutar: ${this.formatCurrency(this.calculateBrutTotalForUpdate())}`, pageWidth - 80 + rightMargin, tableEndY + 20, { align: 'right' });
+    doc.text(`İskonto Tutar: ${this.formatCurrency(this.calculateBrutTotalForUpdate())}`, pageWidth - 80 + rightMargin, tableEndY + 30, { align: 'right' });
+    doc.text(`Net Tutar: ${this.formatCurrency(this.calculateNetTotalForUpdate())}`, pageWidth - 80 + rightMargin, tableEndY + 40, { align: 'right' });
+    doc.text(`Kdv: ${this.formatCurrency(this.calculateTotalTaxForUpdate())}`, pageWidth - 80 + rightMargin, tableEndY + 50, { align: 'right' });
+    doc.text(`Genel Tutar: ${this.formatCurrency(this.calculateGrandTotalForUpdate())}`, pageWidth - 80 + rightMargin, tableEndY + 60, { align: 'right' });
+
+    doc.save('Fatura.pdf');
+  }
+
 }
 
 

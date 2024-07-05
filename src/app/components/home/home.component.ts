@@ -37,6 +37,8 @@ export class HomeComponent implements OnInit {
   totalBanks: number = 0;  // New property to hold the total banks
   totalCustomerChecks: number = 0;  // New property to hold the total customer checks
   totalCompanyChecks: number = 0;  // New property to hold the total company checks
+  totalProductCount: number = 0;  // New property to hold the total product count
+  totalCustomerCount: number = 0;  // New property to hold the total customer count
 
 
   constructor(
@@ -54,6 +56,8 @@ export class HomeComponent implements OnInit {
     this.getTotalBanks();
     this.GetAllChecks();
     this.GetAllCompanyChecks();
+    this.GetAllProductCount();
+    this.GetAllCustomerCount();
   }
 
   getAll() {
@@ -137,6 +141,22 @@ export class HomeComponent implements OnInit {
   GetAllCompanyChecks() {
     this.http.post<number>("DashBoardsCustomers/GetAllCompanyChecks", {}, (res) => {
       this.totalCompanyChecks = res;  // Assign the response to totalBanks
+    }, () => {
+      console.error("Error fetching data");
+    });
+  }
+
+  GetAllProductCount() {
+    this.http.post<number>("DashBoardsCustomers/GetAllSummaryProduct", {}, (res) => {
+      this.totalProductCount = res;  // Assign the response to totalBanks
+    }, () => {
+      console.error("Error fetching data");
+    });
+  }
+
+  GetAllCustomerCount() {
+    this.http.post<number>("DashBoardsCustomers/GetAllSummaryCustomer", {}, (res) => {
+      this.totalCustomerCount = res;  // Assign the response to totalBanks
     }, () => {
       console.error("Error fetching data");
     });
