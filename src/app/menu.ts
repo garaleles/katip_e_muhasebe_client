@@ -154,8 +154,54 @@ export const Menus: MenuModel[] = [
     subMenus: [],
     showThisMenuJustAdmin: false
   },
-
-
+  {
+    name: "Portfoydeki Çekler",
+    icon: "fas fa-money-check-alt",
+    url: "/reports/checks-in-portfolio",
+    isTitle: false,
+    subMenus: [],
+    showThisMenuJustAdmin: false
+  },
+  {
+    name: "Ödenecek Firma Çekleri",
+    icon: "fas fa-wallet",
+    url: "/reports/company-check-reports",
+    isTitle: false,
+    subMenus: [],
+    showThisMenuJustAdmin: false
+  },
+  {
+    name: "Borçlu Müşteriler",
+    icon: "fa-solid fa-users",
+    url: "/reports/debtor-customers",
+    isTitle: false,
+    subMenus: [],
+    showThisMenuJustAdmin: false
+  },
+  {
+    name: "Alacaklı Müşteriler",
+    icon: "fa-solid fa-users",
+    url: "/reports/creditor-customers",
+    isTitle: false,
+    subMenus: [],
+    showThisMenuJustAdmin: false
+  },
+  {
+    name: "Alacaklı Tedarikçiler",
+    icon: "fa-solid fa-users",
+    url: "/reports/creditor-suppliers",
+    isTitle: false,
+    subMenus: [],
+    showThisMenuJustAdmin: false
+  },
+  {
+    name: "Borçlu Tedarikçiler",
+    icon: "fa-solid fa-users",
+    url: "/reports/debtor-suppliers",
+    isTitle: false,
+    subMenus: [],
+    showThisMenuJustAdmin: false
+  },
 
 
 

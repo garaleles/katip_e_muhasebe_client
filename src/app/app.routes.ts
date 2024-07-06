@@ -31,6 +31,12 @@ import {
 import {
   CompanyCheckissuePayrollDetailComponent
 } from "./components/company-checkissue-payroll-detail/company-checkissue-payroll-detail.component";
+import {ChecksInPortfolioComponent} from "./components/checks-in-portfolio/checks-in-portfolio.component";
+import {CompanyCheckReportsComponent} from "./components/company-check-reports/company-check-reports.component";
+import {DebtorCustomersComponent} from "./components/debtor-customers/debtor-customers.component";
+import {CreditorCustomersComponent} from "./components/creditor-customers/creditor-customers.component";
+import {CreditorSuppliersComponent} from "./components/creditor-suppliers/creditor-suppliers.component";
+import {DebtorSuppliersComponent} from "./components/debtor-suppliers/debtor-suppliers.component";
 
 
 export const routes: Routes = [
@@ -156,6 +162,60 @@ export const routes: Routes = [
           {
             path: "product-profitability-report",
             component: ProductProfitabilityReportComponent
+          }
+        ]
+      },
+      {
+        path: "reports",
+        children: [
+          {
+            path: "checks-in-portfolio",
+            component: ChecksInPortfolioComponent
+          }
+        ]
+      },
+      {
+        path: "reports",
+        children: [
+          {
+            path: "company-check-reports",
+            component: CompanyCheckReportsComponent
+          }
+        ]
+      },
+      {
+        path: "reports",
+        children: [
+          {
+            path: "debtor-customers",
+            component: DebtorCustomersComponent
+          }
+        ]
+      },
+      {
+        path: "reports",
+        children: [
+          {
+            path: "creditor-customers",
+            component: CreditorCustomersComponent
+          }
+        ]
+      },
+      {
+        path: "reports",
+        children: [
+          {
+            path: "creditor-suppliers",
+            component: CreditorSuppliersComponent
+          }
+        ]
+      },
+      {
+        path: "reports",
+        children: [
+          {
+            path: "debtor-suppliers",
+            component: DebtorSuppliersComponent
           }
         ]
       },

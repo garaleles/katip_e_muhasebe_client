@@ -1,0 +1,33 @@
+<app-blank pageName="Alacaklı Tedarikçiler Listesi" [routes]="['Raporlar', 'Alacaklı Tedarikçiler Listesi']">
+  <app-section sectionTitle="Alacaklı Tedarikçiler Listesi">
+
+    <table class="table table-hover">
+      <thead>
+      <tr>
+        <th>#</th>
+        <th scope="col">Cari</th>
+        <th scope="col">Borç</th>
+        <th scope="col">Alacak</th>
+        <th scope="col">Bakiye</th>
+
+
+      </tr>
+      </thead>
+
+      <tbody>
+        @for(d of data; track d){
+          <tr>
+            <th scope="row">{{$index + 1}}</th>
+            <td>{{d.name}}</td>
+            <td>{{d.depositAmount| trCurrency:'₺': true}}</td>
+            <td>{{d.withdrawalAmount| trCurrency:'₺': true}}</td>
+            <td>{{d.balance| trCurrency:'₺': true}}</td>
+
+          </tr>
+        }
+      </tbody>
+
+    </table>
+
+  </app-section>
+</app-blank>

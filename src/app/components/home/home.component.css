@@ -1,0 +1,23 @@
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  text-decoration: none;
+  color: black;
+  cursor: pointer;
+}
+
+ul ul {
+  padding-left: 20px;
+}
+
+ul ul li {
+  margin: 5px 0;
+}

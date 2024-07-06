@@ -1,0 +1,41 @@
+<app-blank pageName="Portfoydeki Çekler Listesi" [routes]="['Raporlar', 'Portfoydeki Çekler Listesi']">
+  <app-section sectionTitle="Portfoydeki Çekler Listesi">
+
+    <table class="table table-hover">
+      <thead>
+      <tr>
+        <th>#</th>
+        <th scope="col">Vade</th>
+        <th scope="col">Çek Numarası</th>
+        <th scope="col">Banka</th>
+        <th scope="col">Şube</th>
+        <th scope="col">Hesap No</th>
+        <th scope="col">Borçlusu</th>
+        <th scope="col">Alacaklısı</th>
+        <th scope="col">Ciranta</th>
+        <th scope="col">Tutar</th>
+
+      </tr>
+      </thead>
+
+      <tbody>
+        @for(d of data; track d){
+          <tr>
+            <th scope="row">{{$index + 1}}</th>
+            <td>{{d.dueDate | date:'dd/MM/yyyy'}}</td>
+            <td>{{d.checkNumber}}</td>
+            <td>{{d.bankName}}</td>
+            <td>{{d.branchName}}</td>
+            <td>{{d.accountNumber}}</td>
+            <td>{{d.debtor}}</td>
+            <td>{{d.creditor}}</td>
+            <td>{{d.endorser}}</td>
+            <td>{{d.amount | trCurrency:'₺': true}}</td>
+          </tr>
+        }
+      </tbody>
+
+    </table>
+
+  </app-section>
+</app-blank>
