@@ -1,0 +1,30 @@
+/* General styling for active links */
+.nav-sidebar .nav-link.active {
+  background-color: #007bff; /* Seçili durumda olan menü öğesi için arka plan rengi */
+  color: white; /* Seçili durumda olan menü öğesi için yazı rengi */
+}
+
+/* General styling for all links */
+.nav-sidebar .nav-link {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Styling for headers */
+.nav-sidebar .nav-header {
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: bold;
+}
+
+/* Styling for expanded menus */
+.menu-open > .nav-treeview {
+  display: block !important;
+}
+
+/* Styling for collapsed menus */
+.nav-treeview {
+  display: none;
+}
+/* Geçişleri devre dışı bırakmak için */
+.nav-item, .nav-treeview {
+  transition: none !important;
+}

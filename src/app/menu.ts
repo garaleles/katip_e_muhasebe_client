@@ -4,7 +4,8 @@ export class MenuModel {
   url: string = "";
   isTitle: boolean = false;
   subMenus: MenuModel[] = [];
-  showThisMenuJustAdmin: boolean = false;
+  showThisMenuJustAdmin = false;
+  isExpanded: boolean = false; // Yeni alan
 }
 
 export const Menus: MenuModel[] = [
@@ -14,7 +15,8 @@ export const Menus: MenuModel[] = [
     url: "/",
     isTitle: false,
     subMenus: [],
-    showThisMenuJustAdmin: false
+    showThisMenuJustAdmin: true,
+    isExpanded: false
   },
 
   {
@@ -23,7 +25,8 @@ export const Menus: MenuModel[] = [
     url: "",
     isTitle: true,
     subMenus: [],
-    showThisMenuJustAdmin: true
+    showThisMenuJustAdmin: true,
+    isExpanded: false
   },
   {
     name: "Kullanıcılar",
@@ -31,7 +34,8 @@ export const Menus: MenuModel[] = [
     url: "/users",
     isTitle: false,
     subMenus: [],
-    showThisMenuJustAdmin: true
+    showThisMenuJustAdmin: true,
+    isExpanded: false
   },
   {
     name: "Şirketler",
@@ -39,7 +43,8 @@ export const Menus: MenuModel[] = [
     url: "/companies",
     isTitle: false,
     subMenus: [],
-    showThisMenuJustAdmin: true
+    showThisMenuJustAdmin: true,
+    isExpanded: false
   },
 
   {
@@ -48,7 +53,8 @@ export const Menus: MenuModel[] = [
     url: "",
     isTitle: true,
     subMenus: [],
-    showThisMenuJustAdmin: false
+    showThisMenuJustAdmin: true,
+    isExpanded: false
   },
   {
     name: "Kasalar",
@@ -56,7 +62,8 @@ export const Menus: MenuModel[] = [
     url: "/cash-registers",
     isTitle: false,
     subMenus: [],
-    showThisMenuJustAdmin: false
+    showThisMenuJustAdmin: true,
+    isExpanded: false
   },
   {
     name: "Bankalar",
@@ -64,7 +71,8 @@ export const Menus: MenuModel[] = [
     url: "/banks",
     isTitle: false,
     subMenus: [],
-    showThisMenuJustAdmin: false
+    showThisMenuJustAdmin: true,
+    isExpanded: false
   },
   {
     name: "Cariler",
@@ -72,7 +80,8 @@ export const Menus: MenuModel[] = [
     url: "/customers",
     isTitle: false,
     subMenus: [],
-    showThisMenuJustAdmin: false
+    showThisMenuJustAdmin: true,
+    isExpanded: false
   },
   {
     name: "Ürünler",
@@ -80,7 +89,8 @@ export const Menus: MenuModel[] = [
     url: "/products",
     isTitle: false,
     subMenus: [],
-    showThisMenuJustAdmin: false
+    showThisMenuJustAdmin: true,
+    isExpanded: false
   },
   {
     name: "Kategoriler",
@@ -88,7 +98,8 @@ export const Menus: MenuModel[] = [
     url: "/categories",
     isTitle: false,
     subMenus: [],
-    showThisMenuJustAdmin: false
+    showThisMenuJustAdmin: true,
+    isExpanded: false
   },
   {
     name: "Birimler",
@@ -96,7 +107,8 @@ export const Menus: MenuModel[] = [
     url: "/units",
     isTitle: false,
     subMenus: [],
-    showThisMenuJustAdmin: false
+    showThisMenuJustAdmin: true,
+    isExpanded: false
   },
   {
     name: "Faturalar",
@@ -104,7 +116,8 @@ export const Menus: MenuModel[] = [
     url: "/invoices",
     isTitle: false,
     subMenus: [],
-    showThisMenuJustAdmin: false
+    showThisMenuJustAdmin: true,
+    isExpanded: false
   },
   {
     name: "Çek Giriş Bordroları",
@@ -112,7 +125,8 @@ export const Menus: MenuModel[] = [
     url: "/check-register-payrolls",
     isTitle: false,
     subMenus: [],
-    showThisMenuJustAdmin: false
+    showThisMenuJustAdmin: true,
+    isExpanded: false
   },
   {
     name: "Çek Çıkış Bordroları",
@@ -120,7 +134,8 @@ export const Menus: MenuModel[] = [
     url: "/chequeissue-payrolls",
     isTitle: false,
     subMenus: [],
-    showThisMenuJustAdmin: false
+    showThisMenuJustAdmin: true,
+    isExpanded: false
   },
   {
     name: "Firma Çekleri Bordroları",
@@ -128,7 +143,8 @@ export const Menus: MenuModel[] = [
     url: "/company-checkissue-payrolls",
     isTitle: false,
     subMenus: [],
-    showThisMenuJustAdmin: false
+    showThisMenuJustAdmin: true,
+    isExpanded: false
   },
   {
     name: "Giderler",
@@ -136,73 +152,81 @@ export const Menus: MenuModel[] = [
     url: "/expenses",
     isTitle: false,
     subMenus: [],
-    showThisMenuJustAdmin: false
+    showThisMenuJustAdmin: true,
+    isExpanded: false
   },
   {
     name: "Raporlar",
     icon: "",
     url: "",
-    isTitle: true,
-    subMenus: [],
-    showThisMenuJustAdmin: false
-  },
-  {
-    name: "Stok Karlılık Raporu",
-    icon: "fa-solid fa-chart-simple",
-    url: "/reports/product-profitability-report",
     isTitle: false,
-    subMenus: [],
-    showThisMenuJustAdmin: false
+    subMenus: [
+      {
+        name: "Stok Karlılık Raporu",
+        icon: "fa-solid fa-chart-simple",
+        url: "/reports/product-profitability-report",
+        isTitle: false,
+        subMenus: [],
+        showThisMenuJustAdmin: true,
+        isExpanded: false
+      },
+      {
+        name: "Portfoydeki Çekler",
+        icon: "fas fa-money-check-alt",
+        url: "/reports/checks-in-portfolio",
+        isTitle: false,
+        subMenus: [],
+        showThisMenuJustAdmin: true,
+        isExpanded: false
+      },
+      {
+        name: "Ödenecek Firma Çekleri",
+        icon: "fas fa-wallet",
+        url: "/reports/company-check-reports",
+        isTitle: false,
+        subMenus: [],
+        showThisMenuJustAdmin: true,
+        isExpanded: false
+      },
+      {
+        name: "Borçlu Müşteriler",
+        icon: "fa-solid fa-users",
+        url: "/reports/debtor-customers",
+        isTitle: false,
+        subMenus: [],
+        showThisMenuJustAdmin: true,
+        isExpanded: false
+      },
+      {
+        name: "Alacaklı Müşteriler",
+        icon: "fa-solid fa-users",
+        url: "/reports/creditor-customers",
+        isTitle: false,
+        subMenus: [],
+        showThisMenuJustAdmin: true,
+        isExpanded: false
+      },
+      {
+        name: "Alacaklı Tedarikçiler",
+        icon: "fa-solid fa-users",
+        url: "/reports/creditor-suppliers",
+        isTitle: false,
+        subMenus: [],
+        showThisMenuJustAdmin: true,
+        isExpanded: false
+      },
+      {
+        name: "Borçlu Tedarikçiler",
+        icon: "fa-solid fa-users",
+        url: "/reports/debtor-suppliers",
+        isTitle: false,
+        subMenus: [],
+        showThisMenuJustAdmin: true,
+        isExpanded: false
+      },
+    ],
+    showThisMenuJustAdmin: true,
+    isExpanded: false
   },
-  {
-    name: "Portfoydeki Çekler",
-    icon: "fas fa-money-check-alt",
-    url: "/reports/checks-in-portfolio",
-    isTitle: false,
-    subMenus: [],
-    showThisMenuJustAdmin: false
-  },
-  {
-    name: "Ödenecek Firma Çekleri",
-    icon: "fas fa-wallet",
-    url: "/reports/company-check-reports",
-    isTitle: false,
-    subMenus: [],
-    showThisMenuJustAdmin: false
-  },
-  {
-    name: "Borçlu Müşteriler",
-    icon: "fa-solid fa-users",
-    url: "/reports/debtor-customers",
-    isTitle: false,
-    subMenus: [],
-    showThisMenuJustAdmin: false
-  },
-  {
-    name: "Alacaklı Müşteriler",
-    icon: "fa-solid fa-users",
-    url: "/reports/creditor-customers",
-    isTitle: false,
-    subMenus: [],
-    showThisMenuJustAdmin: false
-  },
-  {
-    name: "Alacaklı Tedarikçiler",
-    icon: "fa-solid fa-users",
-    url: "/reports/creditor-suppliers",
-    isTitle: false,
-    subMenus: [],
-    showThisMenuJustAdmin: false
-  },
-  {
-    name: "Borçlu Tedarikçiler",
-    icon: "fa-solid fa-users",
-    url: "/reports/debtor-suppliers",
-    isTitle: false,
-    subMenus: [],
-    showThisMenuJustAdmin: false
-  },
-
-
-
-]
+  // Diğer menüler
+];

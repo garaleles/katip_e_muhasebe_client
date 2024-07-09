@@ -40,226 +40,88 @@ import {DebtorSuppliersComponent} from "./components/debtor-suppliers/debtor-sup
 
 
 export const routes: Routes = [
+  { path: 'login', component: LoginComponent },
+  { path: 'confirm-email/:email', component: ConfirmEmailComponent },
   {
-    path: "login",
-    component: LoginComponent
-  },
-  {
-    path: "confirm-email/:email",
-    component: ConfirmEmailComponent
-  },
-  {
-    path: "",
+    path: '',
     component: LayoutsComponent,
-    canActivateChild: [() => inject(AuthService).isAuthenticated()],
+    canActivateChild: [() => inject(AuthService).isAuthenticated()], // Auth kontrolü
     children: [
+      { path: '', component: HomeComponent },
+      { path: 'users', component: UsersComponent },
+      { path: 'companies', component: CompaniesComponent },
       {
-        path: "",
-        component: HomeComponent
-      },
-      {
-        path: "users",
-        component: UsersComponent
-      },
-      {
-        path: "companies",
-        component: CompaniesComponent
-      },
-      {
-        path: "cash-registers",
+        path: 'cash-registers',
         children: [
-          {
-            path: "",
-            component: CashRegistersComponent
-          },
-          {
-            path: "details/:id",
-            component: CashRegisterDetailsComponent
-          }
-        ],
-
-      },
-      {
-        path: "banks",
-        children: [
-          {
-            path: "",
-            component: BanksComponent
-          },
-          {
-            path: "details/:id",
-            component: BankDetailComponent
-          }
-
+          { path: '', component: CashRegistersComponent },
+          { path: 'details/:id', component: CashRegisterDetailsComponent }
         ]
       },
       {
-        path: "customers",
+        path: 'banks',
         children: [
-          {
-            path: "",
-            component: CustomerComponent
-          },
-          {
-            path: "details/:id",
-            component: CustomerDetailsComponent
-          }
+          { path: '', component: BanksComponent },
+          { path: 'details/:id', component: BankDetailComponent }
         ]
       },
       {
-        path: "products",
+        path: 'customers',
         children: [
-          {
-            path: "",
-            component: ProductsComponent
-          },
-          {
-            path: "details/:id",
-            component: ProductDetailsComponent
-          }
+          { path: '', component: CustomerComponent },
+          { path: 'details/:id', component: CustomerDetailsComponent }
         ]
       },
       {
-        path: "categories",
+        path: 'products',
         children: [
-          {
-            path: "",
-            component: CategoriesComponent
-          },
-
+          { path: '', component: ProductsComponent },
+          { path: 'details/:id', component: ProductDetailsComponent }
+        ]
+      },
+      { path: 'categories', children: [{ path: '', component: CategoriesComponent }] },
+      { path: 'units', children: [{ path: '', component: UnitsComponent }] },
+      { path: 'invoices', component: InvoiceComponent },
+      {
+        path: 'expenses',
+        children: [
+          { path: '', component: ExpenseComponent },
+          { path: 'details/:id', component: ExpenseDetailComponent }
         ]
       },
       {
-        path: "units",
+        path: 'reports',
         children: [
-          {
-            path: "",
-            component: UnitsComponent
-          },
-
+          { path: '', redirectTo: 'product-profitability-report', pathMatch: 'full' },
+          { path: 'product-profitability-report', component: ProductProfitabilityReportComponent },
+          { path: 'checks-in-portfolio', component: ChecksInPortfolioComponent },
+          { path: 'company-check-reports', component: CompanyCheckReportsComponent },
+          { path: 'debtor-customers', component: DebtorCustomersComponent },
+          { path: 'creditor-customers', component: CreditorCustomersComponent },
+          { path: 'creditor-suppliers', component: CreditorSuppliersComponent },
+          { path: 'debtor-suppliers', component: DebtorSuppliersComponent }
         ]
       },
       {
-        path: "invoices",
-        component: InvoiceComponent
-      },
-      {
-        path: "expenses",
+        path: 'check-register-payrolls',
         children: [
-          {
-            path: "",
-            component: ExpenseComponent
-          },
-          {
-            path: "details/:id",
-            component: ExpenseDetailComponent
-          }
+          { path: '', component: CheckRegisterPayrollComponent },
+          { path: 'details/:id', component: CashRegisterDetailsComponent }
         ]
       },
       {
-        path: "reports",
+        path: 'chequeissue-payrolls',
         children: [
-          {
-            path: "product-profitability-report",
-            component: ProductProfitabilityReportComponent
-          }
+          { path: '', component: ChequeissuePayrollComponent },
+          { path: 'details/:id', component: CashRegisterDetailsComponent } // Burayı kontrol edin
         ]
       },
       {
-        path: "reports",
+        path: 'company-checkissue-payrolls',
         children: [
-          {
-            path: "checks-in-portfolio",
-            component: ChecksInPortfolioComponent
-          }
+          { path: '', component: CompanyCheckissuePayrollComponent },
+          { path: 'details/:id', component: CompanyCheckissuePayrollDetailComponent }
         ]
-      },
-      {
-        path: "reports",
-        children: [
-          {
-            path: "company-check-reports",
-            component: CompanyCheckReportsComponent
-          }
-        ]
-      },
-      {
-        path: "reports",
-        children: [
-          {
-            path: "debtor-customers",
-            component: DebtorCustomersComponent
-          }
-        ]
-      },
-      {
-        path: "reports",
-        children: [
-          {
-            path: "creditor-customers",
-            component: CreditorCustomersComponent
-          }
-        ]
-      },
-      {
-        path: "reports",
-        children: [
-          {
-            path: "creditor-suppliers",
-            component: CreditorSuppliersComponent
-          }
-        ]
-      },
-      {
-        path: "reports",
-        children: [
-          {
-            path: "debtor-suppliers",
-            component: DebtorSuppliersComponent
-          }
-        ]
-      },
-      {
-        path: "check-register-payrolls",
-        children: [
-          {
-            path: "",
-            component: CheckRegisterPayrollComponent
-          },
-          {
-            path: "details/:id",
-            component: CashRegisterDetailsComponent
-          }
-        ]
-      },
-      {
-        path: "chequeissue-payrolls",
-        children: [
-          {
-            path: "",
-            component: ChequeissuePayrollComponent
-          },
-          {
-            path: "details/:id",
-            component: CashRegisterDetailsComponent
-          }
-        ]
-      },
-      {
-        path: "company-checkissue-payrolls",
-        children: [
-          {
-            path: "",
-            component: CompanyCheckissuePayrollComponent
-          },
-          {
-            path: "details/:id",
-            component: CompanyCheckissuePayrollDetailComponent
-          }
-        ]
-      },
-
+      }
     ]
-  },
-
+  }
 ];
