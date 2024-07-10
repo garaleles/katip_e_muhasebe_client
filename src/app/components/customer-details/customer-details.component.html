@@ -6,6 +6,10 @@
           <i class="fa-solid fa-file-excel me-1"></i>
           Excel'e Aktar
         </button>
+        <button class="btn btn-info" data-toggle="modal" data-target="#tListModal" style="margin-left: 5px">
+          <i class="fa-solid fa-table me-1"></i>
+          T Ekstre
+        </button>
       </div>
 
       <div class="col-3">
@@ -55,3 +59,97 @@
 </app-blank>
 
 
+<!-- T List Modal -->
+<div class="modal fade" id="tListModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl"> <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title">T Ekstre</h3>
+      <button type="button" class="btn btn-dark" (click)="exportToExcelTFormat()"> <i class="fa-solid fa-exchange-alt me-1"></i> Excele Transfer Et
+      </button>
+      <button type="button" class="btn btn-outline-danger" data-dismiss="modal">
+        <i class="fa-solid fa-x"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="row">
+        <div class="col-6">
+          <h4 style="color: black">Borç</h4>
+          <table class="table table-bordered">
+            <thead>
+            <tr>
+              <th>Tarih</th>
+              <th>İşlem Numarası</th>
+              <th>Açıklama</th>
+              <th>Tutar</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let debtEntry of debtEntries | paginate: { itemsPerPage: 10, currentPage: pDebt }; let i = index" style="color: black">
+              <td>{{ debtEntry.date | date: 'dd.MM.yyyy' }}</td>
+              <td>{{ debtEntry.processNumber }}</td>
+              <td>{{ debtEntry.description }}</td>
+              <td>{{ debtEntry.depositAmount | trCurrency: '₺': true }}</td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+              <pagination-controls (pageChange)="pDebt = $event"></pagination-controls>
+            </tr>
+            <tr>
+              <td colspan="3" class="text-right">Toplam Borç:</td>
+              <td>{{ totalDebt | trCurrency: '₺': true }}</td>
+            </tr>
+            </tfoot>
+          </table>
+        </div>
+
+
+        <div class="col-6">
+          <h4 style="color: red">Alacak</h4>
+          <table class="table table-bordered">
+            <thead>
+            <tr>
+              <th>Tarih</th>
+              <th>İşlem Numarası</th>
+              <th>Açıklama</th>
+              <th>Tutar</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let creditEntry of creditEntries | paginate: { itemsPerPage: 10, currentPage: pCredit }; let i = index" style="color: red">
+              <td>{{ creditEntry.date | date: 'dd.MM.yyyy' }}</td>
+              <td>{{ creditEntry.processNumber }}</td>
+              <td>{{ creditEntry.description }}</td>
+              <td>{{ creditEntry.withdrawalAmount | trCurrency: '₺': true }}</td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+              <pagination-controls (pageChange)="pCredit = $event"></pagination-controls>
+            </tr>
+            <tr>
+              <td colspan="3" class="text-right">Toplam Alacak:</td>
+              <td>{{ totalCredit | trCurrency: '₺': true }}</td>
+            </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+      <div class="row mt-3">
+        <div class="col-12 text-center">
+          <h4>
+            <span *ngIf="balance >= 0">Borç Bakiye:</span>
+            <span *ngIf="balance < 0">Alacak Bakiye:</span>
+            <span [ngStyle]="{'color': balance < 0 ? 'red' : 'green'}">
+        {{ balance | trCurrency: '₺': true }}
+      </span>
+          </h4>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+  </div>
+</div>

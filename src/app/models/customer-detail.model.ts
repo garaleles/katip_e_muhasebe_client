@@ -9,6 +9,7 @@ export class CustomerDetailModel{
   bankDetailId: string | any = "";
   cacheRegisterDetailId: string  = "";
   processNumber: string | any = "";
+
 }
 
 export class CustomerDetailTypeEnum{

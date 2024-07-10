@@ -32,10 +32,9 @@ export class CashRegisterDetailsComponent implements AfterViewInit{
   startDate: string = "";
   endDate: string = "";
   p: number = 1;
+
   pDebt: number = 1;  // Borç tablosu için sayfa numarası
   pCredit: number = 1; // Alacak tablosu için sayfa numarası
-
-
   debtEntries: CashRegisterDetailModel[] = [];
   creditEntries: CashRegisterDetailModel[] = [];
   filteredEntries: CashRegisterDetailModel[] = [];

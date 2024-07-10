@@ -2,6 +2,9 @@
   <app-section sectionTitle="BALA | Ön Muhasebe" class="text-center">
     <section style="width: 80%; height: auto">
       <h1 style="color: #0c84ff; font-size: 52px; font-family: 'Algerian'">Ana Sayfa</h1>
+      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#tListModal">
+        T Ekstre'yi Görüntüle
+      </button>
       <hr>
       <div class="row">
         <div class="col-4" style="background-color: #00a379; border: 1.5px solid black">
@@ -94,3 +97,86 @@
 
   </app-section>
 </app-blank>
+
+<div class="modal fade" id="tListModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">T Ekstre</h3>
+        <button type="button" class="btn btn-outline-danger" data-dismiss="modal">
+          <i class="fa-solid fa-x"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-6">
+            <h4 style="color: green">AKTİF</h4>
+            <table class="table table-bordered">
+              <tbody>
+              <tr>
+                <th>Stok Değeri:</th>
+                <td>{{ totalStockValue | trCurrency }}</td>
+              </tr>
+              <tr>
+                <th>Portföydeki Alacak Çekleri:</th>
+                <td>{{ totalCustomerChecks | trCurrency }}</td>
+              </tr>
+              <tr>
+                <th>Bankalar Toplam Bakiye:</th>
+                <td>{{ totalBanks | trCurrency }}</td>
+              </tr>
+              <tr>
+                <th>Kasalar Toplam Bakiye:</th>
+                <td>{{ totalCash | trCurrency }}</td>
+              </tr>
+              <tr>
+                <th>Carilerden Alacaklar:</th>
+                <td>{{ totalDebts | trCurrency }}</td>
+              </tr>
+              <tr style="color: green; font-weight: bold;">
+                <th>Toplam:</th>
+                <td>{{ (totalStockValue + totalCustomerChecks + totalBanks + totalCash + totalDebts) | trCurrency }}</td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="col-6">
+            <h4 style="color: red">PASİF</h4>
+            <table class="table table-bordered">
+              <tbody>
+              <tr>
+                <th>Carilere Borçlar:</th>
+                <td>{{ totalWhits | trCurrency }}</td>
+              </tr>
+              <tr>
+                <th>Ödenecek Firma Çekleri:</th>
+                <td>{{ totalCompanyChecks | trCurrency }}</td>
+              </tr>
+              <tr style="color: red; font-weight: bold;">
+                <th>Toplam:</th>
+                <td>{{ (totalWhits + totalCompanyChecks) | trCurrency }}</td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="row mt-3">
+          <div class="col-12 text-center">
+            <h4>
+              FARK:
+              <span [ngStyle]="{'color': (totalStockValue + totalCustomerChecks + totalBanks + totalCash + totalDebts) - (totalWhits + totalCompanyChecks) < 0 ? 'red' : 'green'}">
+                {{ (totalStockValue + totalCustomerChecks + totalBanks + totalCash + totalDebts) - (totalWhits + totalCompanyChecks) | trCurrency }}
+              </span>
+            </h4>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
