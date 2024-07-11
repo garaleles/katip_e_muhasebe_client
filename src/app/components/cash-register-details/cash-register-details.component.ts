@@ -12,7 +12,18 @@ import { BankModel } from '../../models/bank.model';
 import {CustomerModel} from "../../models/customer.model";
 import {ExpenseDetailPipe} from "../../pipes/expense-detail.pipe";
 import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
+// `uint8ArrayToBase64` fonksiyonu
+function uint8ArrayToBase64(uint8Array: Uint8Array): string {
+  let binary = '';
+  const len = uint8Array.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(uint8Array[i]);
+  }
+  return btoa(binary);
+}
 
 @Component({
   selector: 'app-cash-register-details',
@@ -337,5 +348,98 @@ export class CashRegisterDetailsComponent implements AfterViewInit{
     XLSX.writeFile(wb, 'T Ekstre.xlsx');
   }
 
+  async loadDejaVuSansFont(doc: jsPDF) {
+    try {
+      const fontUrl = 'assets/fonts/DejaVuSans.ttf';
+      const response = await fetch(fontUrl);
+
+      if (!response.ok) {
+        throw new Error(`Failed to load font from ${fontUrl}: ${response.statusText}`);
+      }
+
+      const font = await response.arrayBuffer();
+      const fontUint8Array = new Uint8Array(font);
+
+      const base64String = uint8ArrayToBase64(fontUint8Array);
+
+      doc.addFileToVFS('DejaVuSans.ttf', base64String);
+      doc.addFont('DejaVuSans.ttf', 'DejaVuSans', 'normal');
+    } catch (error) {
+      console.error('Error loading font:', error);
+    }
+  }
+
+
+  async exportToPdf() {
+    const doc = new jsPDF({
+      orientation: 'landscape'  // Sayfa yönünü yatay yap
+    });
+
+    await this.loadDejaVuSansFont(doc);
+    doc.setFont('DejaVuSans');
+
+    const margin = 20;  // Kenar boşluğunu azaltalım
+    const fontSize = 10;
+    const columnWidth = (doc.internal.pageSize.width - 2 * margin) / 8; // 8 sütun varsayımı (2 tablo x 4 sütun)
+
+    doc.setFontSize(fontSize);
+// Başlık Y konumunu tablo başlangıcına daha yakın olacak şekilde ayarlayın
+    const headerY = margin + 15; // Daha küçük bir değer deneyin
+    doc.text('Kasa Adı: ' + this.cashRegister.name, margin, headerY - 10);
+    doc.text('Borç', margin, headerY);
+    doc.text('Alacak', margin + 4 * columnWidth, headerY); // Başlıkları tablo başlangıcına daha yakın konumlandır
+
+    function formatDate(dateStr: string | Date): string {
+      const date = typeof dateStr === 'string' ? new Date(dateStr) : dateStr;
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}.${month}.${year}`;
+    }
+
+
+    const bodyData = [];
+    const maxRows = Math.max(this.debtEntries.length, this.creditEntries.length);
+
+    for (let i = 0; i < maxRows; i++) {
+      const debtEntry = this.debtEntries[i] || {};
+      const creditEntry = this.creditEntries[i] || {};
+      bodyData.push([
+        debtEntry.date ? formatDate(debtEntry.date) : '',
+        debtEntry.processNumber || '',
+        debtEntry.description || '',
+        debtEntry.depositAmount ? debtEntry.depositAmount.toFixed(2) : '',
+        creditEntry.date ? formatDate(creditEntry.date) : '',
+        creditEntry.processNumber || '',
+        creditEntry.description || '',
+        creditEntry.withdrawalAmount ? creditEntry.withdrawalAmount.toFixed(2) : '',
+      ]);
+    }
+
+    autoTable(doc, {
+      startY: headerY + 2 * fontSize + 5, // Başlıkları hesaba katmak için 2 * fontSize ekleyin
+      head: [['Tarih', 'No', 'Açıklama', 'Tutar', 'Tarih', 'No', 'Açıklama', 'Tutar']],
+      body: bodyData,
+      theme: 'grid',  // Basit bir tablo görünümü
+      columnStyles: { 0: { cellWidth: columnWidth } }, // Sütun genişliklerini eşitle
+      styles: { font: 'DejaVuSans', fontSize },
+    });
+
+// **Tarih ekleme kısmı**
+    const today = new Date();
+    const formattedDate = formatDate(today);
+    const dateTextWidth = doc.getTextWidth('Tarih: ' + formattedDate);
+    const dateX = doc.internal.pageSize.width - margin - dateTextWidth; // Sağa yaslama
+    doc.text('Tarih: ' + formattedDate, dateX, headerY - 10);
+
+
+// Toplam ve bakiyeyi tablonun altına ekleyin
+    const tableEndY = (doc as any).lastAutoTable.finalY;
+    doc.text(`Toplam Borç: ${this.totalDebt.toFixed(2)}`, margin, tableEndY + 15);
+    doc.text(`Toplam Alacak: ${this.totalCredit.toFixed(2)}`, margin + 4 * columnWidth, tableEndY + 15);
+    doc.text(`Bakiye: ${this.balance.toFixed(2)}`, margin + 2 * columnWidth, tableEndY + 30); // Bakiyeyi ortaya konumla
+
+    doc.save(`${this.cashRegister.name}_T_List.pdf`);
+  }
 
 }
